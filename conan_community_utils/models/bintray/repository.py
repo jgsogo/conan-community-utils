@@ -1,6 +1,6 @@
 
 
-from ..utils.lazy_property import lazy_property
+from conan_community_utils.utils.lazy_property import lazy_property
 from .package import Package
 
 

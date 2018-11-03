@@ -23,7 +23,6 @@ class AppVeyor(object):
 
 if __name__ == "__main__":
     import os
-    from pprint import pprint
 
     t = AppVeyor(os.getenv("APPVEYOR_TOKEN"))
     print("Roles:")

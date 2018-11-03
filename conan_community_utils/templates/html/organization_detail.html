@@ -1,7 +1,7 @@
 {% extends 'html/base.html' %}
 
-{% block title %}conan-community{% endblock %}
-{% block fulltitle %}conan-community | {{ object }}{% endblock %}
+{% block title %}{{ organization }}{% endblock %}
+{% block fulltitle %}Conan community | {{ organization }}{% endblock %}
 
 {% block content_left %}
   <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -11,7 +11,7 @@
         <a class="d-flex align-items-center text-muted" href="#"></a>
       </h6>
       <ul class="nav flex-column">
-        {% for recipe in recipe_list %}
+        {% for recipe in organization.get_recipes() %}
             <li class="nav-item">
               <a class="nav-link" href="{{ recipe.url }}">
                 <span data-feather="file-text"></span>
@@ -22,4 +22,19 @@
       </ul>
     </div>
   </nav>
+{% endblock %}
+
+
+{% block content %}
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">{{ object }}</h1>
+      {% block content_toolbar %}
+      {% endblock %}
+    </div>
+
+    {% block content_detail %}
+      This could be a dashboard
+    {% endblock %}
+  </main>
 {% endblock %}

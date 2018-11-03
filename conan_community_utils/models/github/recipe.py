@@ -3,8 +3,7 @@ import os
 import re
 from github.Repository import Repository
 
-from conan_community_utils import templates
-from conan_community_utils.github.conanfile import ConanFile
+from conan_community_utils.models.github.conanfile import ConanFile
 
 
 class Recipe(object):
@@ -30,10 +29,6 @@ class Recipe(object):
         return getattr(self._repo, item)
 
     @property
-    def url(self):
-        return "{}.html".format(self._repo.name)
-
-    @property
     def conanfile(self):
         if not hasattr(self, '_conanfile'):
             content = self._repo.get_contents("conanfile.py").decoded_content.decode("utf-8")
@@ -53,6 +48,7 @@ class Recipe(object):
                         'object': self})
         return context
 
+    """
     def render(self, output_folder, **context):
         ctxt = self.get_context(**context)
 
@@ -71,6 +67,7 @@ class Recipe(object):
         templates.render('html/recipe_detail_file.html', context=ctxt, output_file=readme_html)
 
         return detail_filename
+    """
 
 
 if __name__ == "__main__":

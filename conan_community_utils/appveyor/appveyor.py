@@ -33,19 +33,5 @@ if __name__ == "__main__":
     print("Projects:")
     for it in t.get_projects():
         print("\t- {}".format(it))
+        print(it.get_status(branch="feauture/profile_auto"))
 
-    exit(0)
-    for it in t._appveyor.projects.get():
-        pprint(it)
-
-        exit(0)
-
-    print("User logged in: {}".format(t))
-
-    for account in t.get_accounts():
-        print(account)
-        for repo in account.get_repositories():
-            print("\t- {}".format(repo))
-
-    repo = t.get_repository('conan-community/conan-nasm-installer')
-    print(repo)

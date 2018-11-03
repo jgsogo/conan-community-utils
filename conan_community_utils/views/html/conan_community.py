@@ -22,6 +22,7 @@ def rate_limits(g):
         print("Calls: {}".format(g.rate_limiting))
         from datetime import datetime
         print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+        print("now: {}".format(datetime.now()))
     if rates[0] == 0:
         exit(0)
 

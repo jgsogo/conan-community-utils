@@ -25,6 +25,10 @@ class Recipe(object):
     def full_name(self):
         return self._repo.full_name
 
+    @property
+    def github_url(self):
+        return self._repo.html_url
+
     def __str__(self):
         return self._repo.name
 

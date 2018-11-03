@@ -39,3 +39,7 @@ class HTMLMixin(object):
         templates.render(template_name, context=self.get_context(),
                          output_file=output_filename)
         return output_filename
+
+    def dump(self):
+        from pprint import pformat
+        return pformat(vars(self))

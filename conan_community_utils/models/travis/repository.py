@@ -10,9 +10,15 @@ class Repository(object):
 
     @property
     def id(self):
-        return self._travis_repository["name"]
+        return self.full_name
 
     @property
     def full_name(self):
         return self._travis_repository["slug"]
 
+    @property
+    def travis_url(self):
+        try:
+            return self._travis_repository["url"]
+        except:
+            return "no-travis-url"

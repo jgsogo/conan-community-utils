@@ -8,8 +8,13 @@ class Project(object):
     def __str__(self):
         return self.name
 
-    def __getattr__(self, item):
-        return self._data.get(item)
+    @property
+    def appveyor_url(self):
+        return "https://ci.appveyor.com/{}".format(self._data[""])
+
+    @property
+    def full_name(self):
+        return self._data["repositoryName"]
 
     def get_status(self, branch):
         data = self._appveyor.projects.last_branch_build(account_name=self.accountName,

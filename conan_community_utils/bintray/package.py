@@ -1,5 +1,6 @@
 
 from ..utils.lazy_property import lazy_property
+from .version import PackageVersion
 
 
 class Package(object):
@@ -8,9 +9,8 @@ class Package(object):
         self._parent = parent
         self._name = name
 
-    def __call__(self, root='packages', *url):
-        name, _ = self._name.split(':')
-        return self._parent(root, self._name, *url)
+    def __call__(self, *url):
+        return self._parent('packages', self._name, *url)
 
     def __getattr__(self, item):
         """ Fallback to bintray.Package properties if not overriden """
@@ -22,3 +22,7 @@ class Package(object):
     @lazy_property
     def data(self):
         return self.__call__()
+
+    def get_versions(self):
+        for version in self.versions:
+            yield PackageVersion(repository=self, name=version)

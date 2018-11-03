@@ -15,7 +15,6 @@ class Bintray(object):
 
     def __call__(self, *url):
         url = '/'.join([BINTRAY_API_URL, '/'.join(url)])
-        print(url)
         r = requests.get(url, auth=self._auth, verify=True)
         return r.json()
 
@@ -40,4 +39,6 @@ if __name__ == '__main__':
             print("\tThere are {} packages:".format(repo.package_count))
             for pck in repo.get_packages():
                 print("\t- {}".format(pck))
-                pprint(pck.data)
+                for version in pck.get_versions():
+                    print("\t\t+ {}".format(version))
+                    # pprint(version.data)

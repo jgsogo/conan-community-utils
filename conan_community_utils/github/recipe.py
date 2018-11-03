@@ -16,7 +16,6 @@ class Recipe(object):
 
     @classmethod
     def is_recipe(cls, repo_name):
-        print(repo_name)
         return bool(re.match(r"conan-[\w_]+", repo_name, re.IGNORECASE))
 
     @property
@@ -78,6 +77,12 @@ if __name__ == "__main__":
     from github import Github
 
     g = Github(os.getenv("GITHUB_TOKEN"))
+
+    print("Rate limits")
+    print("Calls: {}".format(g.rate_limiting))
+    from datetime import datetime
+    print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+
     print("Authorized in Github for user '{}'".format(g.get_user().name))
 
     org = g.get_organization("conan-community").get_repos('all')

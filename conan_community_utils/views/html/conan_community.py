@@ -15,7 +15,24 @@ log = logging.getLogger(__name__)
 me = os.path.dirname(__file__)
 
 
+def rate_limits(g):
+    rates = g.rate_limiting
+    if rates[0] < 1000:
+        print("Rate limits!!!")
+        print("Calls: {}".format(g.rate_limiting))
+        from datetime import datetime
+        print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+    if rates[0] == 0:
+        exit(0)
+
+
 def generate_html(name, output_folder, base_url, force=False):
+    # Get access to Github (do not delete things before checking credentials)
+    gh = Github(os.getenv("GITHUB_TOKEN"))
+    rate_limits(gh)
+    log.debug("Authenticated in Github as user '{}".format(gh.get_user().name))
+
+    # Work on output folder
     output_folder = os.path.abspath(output_folder)
     log.info("Generate HTML for community '{}' in '{}'".format(name, output_folder))
 
@@ -30,10 +47,6 @@ def generate_html(name, output_folder, base_url, force=False):
     # Copy assets
     templates.copy_assets(output_folder)
 
-    # Get access to Github
-    gh = Github(os.getenv("GITHUB_TOKEN"))
-    log.debug("Authenticated in Github as user '{}".format(gh.get_user().name))
-
     # Get organization
     org = gh.get_organization(login=name)
     org = OrganizationHTML(github_org=org, base_url=base_url)
@@ -41,7 +54,9 @@ def generate_html(name, output_folder, base_url, force=False):
     log.info("HTML index: {}".format(index))
 
     for recipe in org.get_recipes():
+        log.info("Rendering recipe '{}'".format(recipe))
         recipe.render(output_folder=output_folder)
+        break
 
     return index
 

@@ -21,12 +21,16 @@ class Recipe(object):
     def id(self):
         return str(self._repo.name)
 
+    @property
+    def full_name(self):
+        return self._repo.full_name
+
     def __str__(self):
         return self._repo.name
 
-    def __getattr__(self, item):
-        """ Fallback to github.Repository properties if not overriden """
-        return getattr(self._repo, item)
+    #def __getattr__(self, item):
+    #    """ Fallback to github.Repository properties if not overriden """
+    #    return getattr(self._repo, item)
 
     @property
     def conanfile(self):

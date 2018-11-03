@@ -6,9 +6,13 @@ class Repository(object):
         self._travis_repository = travis_repository
 
     def __str__(self):
-        return self.slug
+        return self.full_name
 
     @property
-    def slug(self):
-        return self._travis_repository.slug
+    def id(self):
+        return self._travis_repository["name"]
+
+    @property
+    def full_name(self):
+        return self._travis_repository["slug"]
 

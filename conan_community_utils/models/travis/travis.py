@@ -6,6 +6,8 @@ from .repository import Repository
 
 
 class Travis(object):
+    RepositoryClass = Repository
+
     def __init__(self, github_token):
         self._travis = TravisPy.github_auth(github_token)
 
@@ -21,7 +23,8 @@ class Travis(object):
             yield Account(it, self._travis)
 
     def get_repository(self, full_name):
-        return Repository(self._travis.repo(full_name), self._travis)
+        return self.RepositoryClass(travis_repository=self._travis.repo(full_name),
+                                    travis=self._travis)
 
 
 if __name__ == "__main__":

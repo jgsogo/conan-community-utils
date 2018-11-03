@@ -1,0 +1,32 @@
+
+{% extends 'html/recipe_detail.html' %}
+
+{% block extra_css %}
+    {{ super() }}
+    <link href="highlight.default.css" rel="stylesheet">
+    <link href="highlight.line-numbers.css" rel="stylesheet">
+{% endblock %}
+
+
+{% block detail_active %}{% endblock %}
+{% block conanfile_active %}{% if file.name == 'conanfile.py' %}active{% endif %}{% endblock %}
+{% block readme_active %}{% if file.name == 'README.md' %}active{% endif %}{% endblock %}
+
+{% block content_recipe_detail %}
+    <h4>{{ file.name }}</h4>
+    <div>
+        <pre><code class="{{ file.language }}">
+{{ file.content }}
+        </code></pre>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    {{ super() }}
+    <script src="highlight.pack.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.5.0/highlightjs-line-numbers.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        hljs.initLineNumbersOnLoad();
+    </script>
+{% endblock %}

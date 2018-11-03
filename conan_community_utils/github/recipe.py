@@ -4,12 +4,11 @@ import re
 from github.Repository import Repository
 
 from conan_community_utils import templates
+from conan_community_utils.github.conanfile import ConanFile
 
 
 class Recipe(object):
     """ Models a conan recipe in Github """
-
-    template_name = 'html/recipe_detail.html'
 
     def __init__(self, repo):
         assert isinstance(repo, Repository)
@@ -19,6 +18,10 @@ class Recipe(object):
     def is_recipe(cls, repo_name):
         print(repo_name)
         return bool(re.match(r"conan-[\w_]+", repo_name, re.IGNORECASE))
+
+    @property
+    def id(self):
+        return str(self._repo.name)
 
     def __str__(self):
         return self._repo.name
@@ -33,9 +36,18 @@ class Recipe(object):
 
     @property
     def conanfile(self):
-        content = self._repo.get_contents("conanfile.py").decoded_content.decode("utf-8")
-        print(type(content))
-        return content
+        if not hasattr(self, '_conanfile'):
+            content = self._repo.get_contents("conanfile.py").decoded_content.decode("utf-8")
+            conanfile = ConanFile(content=content)
+            setattr(self, '_conanfile', conanfile)
+        return getattr(self, '_conanfile')
+
+    @property
+    def readme(self):
+        content = self._repo.get_contents("README.md").decoded_content.decode("utf-8")
+        return {'name': "README.md",
+                'content': content,
+                'languge': 'markdown'}
 
     def get_context(self, **context):
         context.update({'recipe': self,
@@ -43,9 +55,23 @@ class Recipe(object):
         return context
 
     def render(self, output_folder, **context):
-        output_filename = os.path.join(output_folder, self.url)
-        templates.render(self.template_name, self.get_context(**context), output_file=output_filename)
-        return output_filename
+        ctxt = self.get_context(**context)
+
+        # detail
+        detail_filename = os.path.join(output_folder, self.url)
+        templates.render('html/recipe_detail.html', context=ctxt, output_file=detail_filename)
+
+        # conanfile
+        conanfile_html = os.path.join(output_folder, self._repo.name + '_conanfile.html')
+        ctxt.update({'file': self.conanfile})
+        templates.render('html/recipe_detail_file.html', context=ctxt, output_file=conanfile_html)
+
+        # readme
+        readme_html = os.path.join(output_folder, self._repo.name + '_readme.html')
+        ctxt.update({'file': self.readme})
+        templates.render('html/recipe_detail_file.html', context=ctxt, output_file=readme_html)
+
+        return detail_filename
 
 
 if __name__ == "__main__":

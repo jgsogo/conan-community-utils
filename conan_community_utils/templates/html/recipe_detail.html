@@ -1,12 +1,6 @@
 
 {% extends 'html/conan_community.html' %}
 
-{% block extra_css %}
-    {{ super() }}
-    <link href="highlight.default.css" rel="stylesheet">
-    <link href="highlight.line-numbers.css" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
   <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -25,22 +19,50 @@
       </div>
     </div>
 
-    <h4>conanfile.py</h4>
-    <div>
-        <pre><code class="python">
-{{ recipe.conanfile }}
-        </code></pre>
-    </div>
+    {% block content_recipe %}
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link {% block detail_active %}active{% endblock %}" href="{{ recipe.url }}" role="tab" aria-controls="detail" aria-selected="true">Details</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% block conanfile_active %}{% endblock %}" href="{{ recipe.id }}_conanfile.html" role="tab" aria-controls="conanfile" aria-selected="false">conanfile.py</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% block readme_active %}{% endblock %}" href="{{ recipe.id }}_readme.html" role="tab" aria-controls="readme" aria-selected="false">readme.md</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="nav-home-tab">
+            {% block content_recipe_detail %}
+                <p>These are the fields defined inside the conanfile.py</p>
+                <dl class="row">
+                  <dt class="col-sm-3">Description lists</dt>
+                  <dd class="col-sm-9">A description list is perfect for defining terms.</dd>
+
+                  <dt class="col-sm-3">Euismod</dt>
+                  <dd class="col-sm-9">
+                    <p>Vestibulum id ligula porta felis euismod semper eget lacinia odio sem nec elit.</p>
+                    <p>Donec id elit non mi porta gravida at eget metus.</p>
+                  </dd>
+
+                  <dt class="col-sm-3">Malesuada porta</dt>
+                  <dd class="col-sm-9">Etiam porta sem malesuada magna mollis euismod.</dd>
+
+                  <dt class="col-sm-3 text-truncate">Truncated term is truncated</dt>
+                  <dd class="col-sm-9">Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</dd>
+
+                  <dt class="col-sm-3">Nesting</dt>
+                  <dd class="col-sm-9">
+                    <dl class="row">
+                      <dt class="col-sm-4">Nested definition list</dt>
+                      <dd class="col-sm-8">Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc.</dd>
+                    </dl>
+                  </dd>
+                </dl>
+            {% endblock %}
+        </div>
+      </div>
+    {% endblock %}
   </main>
 
-{% endblock %}
-
-{% block extra_js %}
-    {{ super() }}
-    <script src="highlight.pack.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.5.0/highlightjs-line-numbers.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad();
-        hljs.initLineNumbersOnLoad();
-    </script>
 {% endblock %}

@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
     org = g.get_organization("conan-community").get_repos('all')
     recipes = []
-    for r in org[:3]:
+    for r in org[:1]:
         if Recipe.is_recipe(r.name):
             recipes.append(Recipe(repo=r))
 
@@ -100,6 +100,12 @@ if __name__ == "__main__":
     p = os.path.join(os.path.dirname(__file__), 'tmp')
     os.makedirs(p, exist_ok=True)
     for recipe in recipes:
-        filename = recipe.render(output_folder=p, recipe_list=recipes)
-        print(filename)
+        #filename = recipe.render(output_folder=p, recipe_list=recipes)
+        #print(filename)
+        print(recipe)
 
+
+    print("Rate limits")
+    print("Calls: {}".format(g.rate_limiting))
+    from datetime import datetime
+    print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))

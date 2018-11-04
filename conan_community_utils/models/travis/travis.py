@@ -27,8 +27,22 @@ class Travis(object):
                                     travis=self._travis)
 
 
+def rate_limits():
+    from github import Github
+
+    g = Github(os.getenv("GITHUB_TOKEN"))
+
+    print("Rate limits")
+    print("Calls: {}".format(g.rate_limiting))
+    from datetime import datetime
+    print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+
+
 if __name__ == "__main__":
     import os
+
+    rate_limits()
+
     t = Travis(os.getenv("GITHUB_TOKEN"))
     print("User logged in: {}".format(t))
 
@@ -36,6 +50,9 @@ if __name__ == "__main__":
         print(account)
         for repo in account.get_repositories():
             print("\t- {}".format(repo))
+            break
 
     repo = t.get_repository('conan-community/conan-nasm-installer')
     print(repo)
+
+    rate_limits()

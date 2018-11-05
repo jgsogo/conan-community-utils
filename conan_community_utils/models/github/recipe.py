@@ -107,6 +107,10 @@ if __name__ == "__main__":
         print(recipe._repo.html_url)
         for branch in recipe.get_branches():
             print(" - {} is release {}".format(branch, Recipe.is_release_branch(branch)))
+            if Recipe.is_release_branch(branch):
+                content = recipe._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
+                conanfile = ConanFile(content=content)
+                print(conanfile._attribs["version"])
 
     print("Rate limits")
     print("Calls: {}".format(g.rate_limiting))

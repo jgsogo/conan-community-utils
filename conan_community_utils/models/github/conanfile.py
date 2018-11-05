@@ -1,6 +1,8 @@
 
 import ast
 
+from conan_community_utils.utils.file_view import FileView
+
 
 class MyVisitor(ast.NodeVisitor):
     conanfile_attribs = {}
@@ -34,24 +36,18 @@ class MyVisitor(ast.NodeVisitor):
                     self.conanfile_attribs[str(statement.targets[0].id)] = get_value(statement.value)
 
 
-class ConanFile(object):
+class ConanFile(FileView):
     name = 'conanfile.py'
     language = 'python'
 
     def __init__(self, content):
-        self._content = content
+        super().__init__(content=content)
 
-        root = ast.parse(self._content)
+        root = ast.parse(self.content)
         visitor = MyVisitor()
         visitor.visit(root)
         self._attribs = visitor.conanfile_attribs
 
-    def __getattr__(self, item):
-        return self._attribs.get(item)
-
-    @property
-    def content(self):
-        return self._content
 
 
 if __name__ == '__main__':
@@ -78,3 +74,4 @@ class ZlibConan(ConanFile):
     """
 
     c = ConanFile(content=conanfile)
+    print(c.name)

@@ -1,4 +1,6 @@
 
+from github.Organization import Organization as github_Organization
+
 from .recipe import Recipe
 import logging
 
@@ -9,9 +11,14 @@ class Organization(object):
     RecipeClass = Recipe
 
     def __init__(self, github_org):
+        assert isinstance(github_org, github_Organization)
         self._github_org = github_org
 
     def __str__(self):
+        return self.id
+
+    @property
+    def id(self):
         return self._github_org.name
 
     def get_recipes(self):

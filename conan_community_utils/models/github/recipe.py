@@ -1,8 +1,9 @@
 
 import os
 import re
-from github.Repository import Repository
+from github.Repository import Repository as github_Repository
 
+from conan_community_utils.utils.file_view import FileView
 from conan_community_utils.models.github.conanfile import ConanFile
 
 
@@ -10,12 +11,19 @@ class Recipe(object):
     """ Models a conan recipe in Github """
 
     def __init__(self, repo):
-        assert isinstance(repo, Repository)
+        assert isinstance(repo, github_Repository)
         self._repo = repo
+
+    def __str__(self):
+        return self.id
 
     @classmethod
     def is_recipe(cls, repo_name):
         return bool(re.match(r"conan-[\w_]+", repo_name, re.IGNORECASE))
+
+    @classmethod
+    def is_release_branch(cls, branch_name):
+        return bool(re.match(r"release/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch_name))
 
     @property
     def id(self):
@@ -27,14 +35,10 @@ class Recipe(object):
 
     @property
     def github_url(self):
-        return self._repo.html_url
+        return self._repo.html_url  # TODO: git_url
 
-    def __str__(self):
-        return self._repo.name
-
-    #def __getattr__(self, item):
-    #    """ Fallback to github.Repository properties if not overriden """
-    #    return getattr(self._repo, item)
+    def get_branches(self):
+        return [branch.name for branch in self._repo.get_branches()]
 
     @property
     def conanfile(self):
@@ -46,15 +50,12 @@ class Recipe(object):
 
     @property
     def readme(self):
-        content = self._repo.get_contents("README.md").decoded_content.decode("utf-8")
-        return {'name': "README.md",
-                'content': content,
-                'languge': 'markdown'}
+        class Readme(FileView):
+            name = "README.md"
+            language = 'markdown'
 
-    def get_context(self, **context):
-        context.update({'recipe': self,
-                        'object': self})
-        return context
+        content = self._repo.get_contents("README.md").decoded_content.decode("utf-8")
+        return Readme(content=content)
 
     """
     def render(self, output_folder, **context):
@@ -103,7 +104,9 @@ if __name__ == "__main__":
         #filename = recipe.render(output_folder=p, recipe_list=recipes)
         #print(filename)
         print(recipe)
-
+        print(recipe._repo.html_url)
+        for branch in recipe.get_branches():
+            print(" - {} is release {}".format(branch, Recipe.is_release_branch(branch)))
 
     print("Rate limits")
     print("Calls: {}".format(g.rate_limiting))

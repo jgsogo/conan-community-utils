@@ -1,11 +1,16 @@
 
 import os
-from functools import partial
+from functools import partial, partialmethod
+from slugify import slugify
+from urllib.parse import quote
 
 from conan_community_utils.models import github
-from conan_community_utils.models import travis
-from conan_community_utils.models import appveyor
+#from conan_community_utils.models import travis
+#from conan_community_utils.models import appveyor
 from conan_community_utils.views.html._html_mixin import HTMLMixin
+
+import logging
+log = logging.getLogger(__name__)
 
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -13,17 +18,30 @@ APPVEYOR_TOKEN = os.getenv("APPVEYOR_TOKEN")
 
 
 class RecipeHTML(HTMLMixin, github.Recipe):
-    detail_url = '{self.id}/detail.html'
+    detail_url = '{self.id}/detail/{branch}.html'
     template_name = 'html/recipe_detail.html'
 
     def __init__(self, organization, *args, **kwargs):
         super(RecipeHTML, self).__init__(*args, **kwargs)
         self._organization = organization
+        self.branches = self.get_branches()  # [br for br in self.get_branches() if github.Recipe.is_release_branch(br)]
+        self.main_branch = self.branches[0]
+        self.active_branch = None
 
     @property
     def external_url(self):
         return self.github_url
 
+    @property
+    def url(self):
+        return self.get_url()
+
+    def get_url(self, branch=None):
+        branch = branch or self.main_branch
+        detail_url = self.detail_url.format(self=self, branch=slugify(branch))
+        return os.path.join(self._base_url, detail_url)
+
+    """
     @property
     def github(self):
         return self
@@ -48,6 +66,12 @@ class RecipeHTML(HTMLMixin, github.Recipe):
             appveyor_repo = t.get_project(full_name=self._repo.full_name)
             setattr(self, '_appveyor', appveyor_repo)
         return getattr(self, '_appveyor')
+    """
+
+    def get_detail_url(self, branch=None):
+        branch = branch or self.active_branch
+        detail_url = self.detail_url.format(self=self, branch=slugify(branch))
+        return detail_url
 
     def get_context(self, **context):
         context = super(RecipeHTML, self).get_context(**context)
@@ -57,11 +81,14 @@ class RecipeHTML(HTMLMixin, github.Recipe):
         return context
 
     def render(self, output_folder):
-        detail_html = super(RecipeHTML, self).render(output_folder=output_folder)
-        self.travis.render(output_folder=output_folder)
-        self.appveyor.render(output_folder=output_folder)
-        return detail_html
+        for branch in self.get_branches():
+            self.active_branch = branch
+            log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
+            html = super().render(output_folder=output_folder)
+        self.active_branch = None
+        return html
 
+"""
 
 class RecipeTravisHTML(HTMLMixin, travis.Repository):
     detail_url = '{self.id}/detail/travis.html'
@@ -102,3 +129,5 @@ class RecipeAppveyorHTML(HTMLMixin, appveyor.Project):
                         'organization': self._recipe._organization})
         return context
 
+
+"""

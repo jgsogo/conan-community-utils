@@ -3,12 +3,22 @@ import os
 import re
 from github.Repository import Repository as github_Repository
 
+from conan_community_utils.models.travis import Travis
+from conan_community_utils.models.appveyor import Appveyor
 from conan_community_utils.utils.file_view import FileView
 from conan_community_utils.models.github.conanfile import ConanFile
 
 
+class Readme(FileView):
+    name = "README.md"
+    language = 'markdown'
+
+
 class Recipe(object):
     """ Models a conan recipe in Github """
+
+    travis = Travis(token=os.getenv("TRAVIS_TOKEN"))
+    appveyor = Appveyor(token=os.getenv("APPVEYOR_TOKEN"))
 
     def __init__(self, repo):
         assert isinstance(repo, github_Repository)
@@ -40,22 +50,27 @@ class Recipe(object):
     def get_branches(self):
         return [branch.name for branch in self._repo.get_branches()]
 
-    @property
-    def conanfile(self):
-        if not hasattr(self, '_conanfile'):
-            content = self._repo.get_contents("conanfile.py").decoded_content.decode("utf-8")
-            conanfile = ConanFile(content=content)
-            setattr(self, '_conanfile', conanfile)
-        return getattr(self, '_conanfile')
+    def get_conanfile(self, branch):
+        content = self._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
+        conanfile = ConanFile(content=content)
+        return conanfile
 
-    @property
-    def readme(self):
-        class Readme(FileView):
-            name = "README.md"
-            language = 'markdown'
+    def get_readme(self, branch):
+        content = self._repo.get_contents("README.md", ref=branch).decoded_content.decode("utf-8")
+        readme = Readme(content=content)
+        return readme
 
-        content = self._repo.get_contents("README.md").decoded_content.decode("utf-8")
-        return Readme(content=content)
+    def get_travis_status(self, branch):
+        r = self.travis.get_last_build(self.full_name, branch=branch)
+        return r.get("state", "unknown")
+
+    def get_appveyor_status(self, branch):
+        try:
+            r = self.appveyor.get_last_build(repo=self.id, branch=branch)
+            return r.get("status", "unknown")
+        except AttributeError:
+            return "unknown"
+
 
     """
     def render(self, output_folder, **context):
@@ -108,9 +123,10 @@ if __name__ == "__main__":
         for branch in recipe.get_branches():
             print(" - {} is release {}".format(branch, Recipe.is_release_branch(branch)))
             if Recipe.is_release_branch(branch):
-                content = recipe._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
-                conanfile = ConanFile(content=content)
+                conanfile = recipe.get_conanfile(branch=branch)
                 print(conanfile._attribs["version"])
+                print(recipe.get_travis_status(branch=branch))
+                print(recipe.get_appveyor_status(branch=branch))
 
     print("Rate limits")
     print("Calls: {}".format(g.rate_limiting))

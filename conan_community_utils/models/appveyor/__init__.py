@@ -1,7 +1,9 @@
 
+import os
 import requests
 import dateutil.parser
 from urllib.parse import quote
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -26,7 +28,8 @@ class Appveyor(object):
         r = r.json()
         print(r)
 
-    def get_last_build(self, account, repo, branch):
+    def get_last_build(self, repo, branch, account=None):
+        account = account or os.getenv("APPVEYOR_ACCOUNT")
         log.debug(f"Appveyor::get_last_build(repo='{repo}', branch='{branch}')")
         url = f"{self._appveyor_url}/projects/{quote(account, safe='')}/{quote(repo, safe='')}/branch/{quote(branch, safe='')}"
         r = requests.get(url=url, headers=self.headers())
@@ -40,8 +43,6 @@ class Appveyor(object):
 
             return ret
         except KeyError:
-            from pprint import pprint
-            pprint(r)
             return None
 
 

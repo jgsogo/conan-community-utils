@@ -17,7 +17,7 @@ me = os.path.dirname(__file__)
 
 def rate_limits(g):
     rates = g.rate_limiting
-    if rates[0] < 1000:
+    if rates[0] < 4000:
         print("Rate limits!!!")
         print("Calls: {}".format(g.rate_limiting))
         from datetime import datetime
@@ -57,7 +57,6 @@ def generate_html(name, output_folder, base_url, force=False):
     for recipe in org.get_recipes():
         log.info("Rendering recipe '{}'".format(recipe))
         recipe.render(output_folder=output_folder)
-        break
 
     return index
 

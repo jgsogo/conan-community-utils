@@ -1,6 +1,8 @@
 
+import functools
 from github.Organization import Organization as github_Organization
 
+from conan_community_utils.utils.lazy_property import lazy_property
 from .recipe import Recipe
 import logging
 
@@ -21,9 +23,12 @@ class Organization(object):
     def id(self):
         return self._github_org.name
 
+    @functools.lru_cache()
     def get_recipes(self):
-        for repo in self._github_org.get_repos('all'):
+        ret = []
+        for repo in self._github_org.get_repos('all')[:4]:
             if Recipe.is_recipe(repo.name):
-                yield self.RecipeClass(repo=repo)
+                ret.append(self.RecipeClass(repo=repo))
             else:
                 log.debug("Repository '{}/{}' discarded as recipe".format(self, repo.name))
+        return ret

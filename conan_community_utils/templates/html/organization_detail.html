@@ -37,13 +37,12 @@
       {% endblock %}
     </div>
 
-    {% if object.external_url %}<small>External link: {{ object.external_url }}</small>{% endif %}
     {% block content_detail %}
       html/organization_detail.html -- This could be a dashboard
     {% endblock %}
 
-      <pre><code>
-        {{ object.dump() }}
-      </code></pre>
+    <pre><code>
+      {{ object.dump() }}
+    </code></pre>
   </main>
 {% endblock %}

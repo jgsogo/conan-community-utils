@@ -4,20 +4,14 @@
 {% block content_toolbar %}
 <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group mr-2">
-        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.github_url }}" role="button">Github</a>
-        {% if recipe.travis %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.travis.url }}" role="button">Travis</a>
-        {% endif %}
-        {% if recipe.appveyor %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.appveyor.url }}" role="button">AppVeyor</a>
-        {% endif %}
+        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.github_url }}" role="button">Github <span data-feather="external-link"></span></a>
         {% if recipe.bintray %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.bintray.url }}" role="button">Bontray</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.bintray.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
         {% endif %}
     </div>
     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" id="branchesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <span data-feather="calendar"></span>
-        Branches
+        <span data-feather="git-branch"></span>
+        {{ recipe.active_branch }}
     </button>
     <div class="dropdown-menu" aria-labelledby="branchesMenuButton">
         {% for branch in recipe.get_branches() %}
@@ -29,6 +23,11 @@
 
 {% block content_detail %}
   html/recipe_detail.html
+    <p>
+        Build status for branch <strong>{{ recipe.active_branch }}:</strong>
+        <a href="#"><img src="https://travis-ci.org/travis-ci/travis-web.svg?branch=master"></a>
+        <a href="#"><img src="https://travis-ci.org/travis-ci/travis-web.svg?branch=master"></a>
+    </p>
 {% endblock %}
 
 

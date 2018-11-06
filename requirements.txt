@@ -1,3 +1,4 @@
 PyGithub
 Jinja2
 python-slugify
+python-dateutil

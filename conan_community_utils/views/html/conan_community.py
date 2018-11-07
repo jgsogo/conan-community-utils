@@ -77,7 +77,7 @@ if __name__ == '__main__':
     name = 'conan-community'
     base_url = args.base_url
     target_branch = 'master'
-    output_folder = os.path.join(me, '..', '..', '..', '..', 'web')
+    output_folder = os.path.join(me, '..', '..', '..', '..', 'tmp')
     #base_url = output_folder + "/"
     force = True
 

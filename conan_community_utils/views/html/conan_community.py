@@ -55,8 +55,11 @@ def generate_html(name, output_folder, base_url, force=False):
     log.info("HTML index: {}".format(index))
 
     for recipe in org.get_recipes():
-        log.info("Rendering recipe '{}'".format(recipe))
-        recipe.render(output_folder=output_folder)
+        try:
+            log.info("Rendering recipe '{}'".format(recipe))
+            recipe.render(output_folder=output_folder)
+        except Exception as e:
+            log.error(f">> ERROR rendering recipe '{recipe}': {e}")
 
     return index
 

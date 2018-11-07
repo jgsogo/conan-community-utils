@@ -70,8 +70,3 @@ class RecipeHTML(HTMLMixin, github.Recipe):
             super().render(output_folder=output_folder)
         self.active_branch = None
         return html
-
-    def get_img_travis(self, branch):
-        status = self.get_travis_status(branch=branch)
-        travis_images = {'unknown': '',
-                         'success': ''}

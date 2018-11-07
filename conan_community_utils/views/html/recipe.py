@@ -19,7 +19,6 @@ APPVEYOR_TOKEN = os.getenv("APPVEYOR_TOKEN")
 
 class RecipeHTML(HTMLMixin, github.Recipe):
     detail_url = '{self.id}/detail/{branch}.html'
-    template_name = 'html/recipe_detail.html'
 
     def __init__(self, organization, *args, **kwargs):
         super(RecipeHTML, self).__init__(*args, **kwargs)
@@ -34,44 +33,25 @@ class RecipeHTML(HTMLMixin, github.Recipe):
 
     @property
     def url(self):
-        return self.get_url()
+        return self.get_url(branch=None)
 
     def get_url(self, branch=None):
-        branch = branch or self.main_branch
-        detail_url = self.detail_url.format(self=self, branch=slugify(branch))
-        return os.path.join(self._base_url, detail_url)
-
-    """
-    @property
-    def github(self):
-        return self
-
-    @property
-    def travis(self):
-        if not hasattr(self, '_travis'):
-            t = travis.Travis(GITHUB_TOKEN)
-            t.RepositoryClass = partial(RecipeTravisHTML, recipe=self, base_url=self._base_url)
-            travis_repo = t.get_repository(full_name=self._repo.full_name)
-            #assert self.id == travis_repo.id, "{} != {}".format(self.id, travis_repo.id)
-            assert self.full_name == travis_repo.full_name, \
-                "{} != {}".format(self.full_name, travis_repo.full_name)
-            setattr(self, '_travis', travis_repo)
-        return getattr(self, '_travis')
-
-    @property
-    def appveyor(self):
-        if not hasattr(self, '_appveyor'):
-            t = appveyor.AppVeyor(APPVEYOR_TOKEN)
-            t.ProjectClass = partial(RecipeAppveyorHTML, recipe=self, base_url=self._base_url)
-            appveyor_repo = t.get_project(full_name=self._repo.full_name)
-            setattr(self, '_appveyor', appveyor_repo)
-        return getattr(self, '_appveyor')
-    """
+        return os.path.join(self._base_url, self.get_detail_url(branch=branch))
 
     def get_detail_url(self, branch=None):
-        branch = branch or self.active_branch
-        detail_url = self.detail_url.format(self=self, branch=slugify(branch))
-        return detail_url
+        branch = branch if branch is not None else self.active_branch
+        if branch:
+            detail_url = self.detail_url.format(self=self, branch=slugify(branch))
+            return detail_url
+        else:
+            detail_url = self.detail_url.format(self=self, branch="index")
+            return detail_url
+
+    def get_template_name(self):
+        if self.active_branch:
+            return 'html/recipe_detail_branch.html'
+        else:
+            return 'html/recipe_detail.html'
 
     def get_context(self, **context):
         context = super(RecipeHTML, self).get_context(**context)
@@ -81,53 +61,17 @@ class RecipeHTML(HTMLMixin, github.Recipe):
         return context
 
     def render(self, output_folder):
+        log.debug(f"Render recipe detail '{self.id}'")
+        html = super().render(output_folder=output_folder)
+
         for branch in self.get_branches():
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
-            html = super().render(output_folder=output_folder)
+            super().render(output_folder=output_folder)
         self.active_branch = None
         return html
 
-"""
-
-class RecipeTravisHTML(HTMLMixin, travis.Repository):
-    detail_url = '{self.id}/detail/travis.html'
-    template_name = 'html/recipe_detail_travis.html'
-
-    def __init__(self, recipe, *args, **kwargs):
-        super(RecipeTravisHTML, self).__init__(*args, **kwargs)
-        self._recipe = recipe
-
-    @property
-    def external_url(self):
-        return self.travis_url
-
-    def get_context(self, **context):
-        context = super(RecipeTravisHTML, self).get_context(**context)
-        context.update({'recipe': self._recipe,
-                        'travis': self,
-                        'organization': self._recipe._organization})
-        return context
-
-
-class RecipeAppveyorHTML(HTMLMixin, appveyor.Project):
-    detail_url = '{self.id}/detail/appveyor.html'
-    template_name = 'html/recipe_detail_appveyor.html'
-
-    def __init__(self, recipe, *args, **kwargs):
-        super(RecipeAppveyorHTML, self).__init__(*args, **kwargs)
-        self._recipe = recipe
-
-    @property
-    def external_url(self):
-        return self.appveyor_url
-
-    def get_context(self, **context):
-        context = super(RecipeAppveyorHTML, self).get_context(**context)
-        context.update({'recipe': self._recipe,
-                        'appveyor': self,
-                        'organization': self._recipe._organization})
-        return context
-
-
-"""
+    def get_img_travis(self, branch):
+        status = self.get_travis_status(branch=branch)
+        travis_images = {'unknown': '',
+                         'success': ''}

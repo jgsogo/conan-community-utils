@@ -2,6 +2,9 @@ import os
 
 from conan_community_utils import templates
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class HTMLMixin(object):
     detail_url = None
@@ -38,6 +41,7 @@ class HTMLMixin(object):
         template_name = self.get_template_name()
         templates.render(template_name, context=self.get_context(),
                          output_file=output_filename)
+        log.debug(f"> Generated '{output_filename}'")
         return output_filename
 
     def dump(self):

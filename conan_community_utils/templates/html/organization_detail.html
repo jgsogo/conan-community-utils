@@ -14,7 +14,7 @@
       <ul class="nav flex-column">
         {% for recipe in organization.get_recipes() %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ recipe.url }}">
+              <a class="nav-link" href="{{ recipe.get_url(branch=False) }}">
                 <span data-feather="file-text"></span>
                 {{ recipe }}
               </a>
@@ -44,5 +44,6 @@
     <pre><code>
       {{ object.dump() }}
     </code></pre>
+    Generation done at {{ now() }}
   </main>
 {% endblock %}

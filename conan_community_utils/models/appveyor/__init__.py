@@ -35,15 +35,14 @@ class Appveyor(object):
         r = requests.get(url=url, headers=self.headers())
         r = r.json()
 
-        try:
-            ret = {'commit': {'sha': r["build"]["commitId"],
-                              'datetime': dateutil.parser.parse(r["build"]["committed"],)},
-                   'jobs': [it["status"] for it in r["build"]["jobs"]],
-                   'status': r["build"]["status"]}
+        url = f"https://ci.appveyor.com/project/{quote(account, safe='')}/{quote(repo, safe='')}/builds/{r['build']['buildId']}"
+        ret = {'commit': {'sha': r["build"]["commitId"],
+                          'datetime': dateutil.parser.parse(r["build"]["committed"],)},
+               'jobs': [it["status"] for it in r["build"]["jobs"]],
+               'status': r["build"]["status"],
+               'url': url}
 
-            return ret
-        except KeyError:
-            return None
+        return ret
 
 
 if __name__ == '__main__':

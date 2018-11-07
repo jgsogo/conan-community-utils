@@ -1,4 +1,5 @@
 
+import os
 import requests
 import dateutil.parser
 from urllib.parse import quote, urlencode
@@ -27,9 +28,10 @@ class Travis(object):
               'include': 'job.state'}
         r = requests.get(url=url, headers=self.headers(), params=urlencode(qs))
         r = r.json()
-
         build = r["builds"][0]
-        ret = {'state': build["state"],
+        _, build_id = build['@href'].rsplit('/', 1)
+        ret = {'url': 'https://travis-ci.org/' + build['repository']['slug'] + '/builds/' + build_id,
+               'state': build["state"],
                'jobs': [it["state"] for it in build["jobs"]],
                'commit': {'sha': build["commit"]["sha"],
                           'message': build["commit"]["message"],

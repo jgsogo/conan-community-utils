@@ -62,36 +62,14 @@ class Recipe(object):
 
     def get_travis_status(self, branch):
         r = self.travis.get_last_build(self.full_name, branch=branch)
-        return r.get("state", "unknown")
+        return r.get("state", "unknown"), r['url']
 
     def get_appveyor_status(self, branch):
         try:
             r = self.appveyor.get_last_build(repo=self.id, branch=branch)
-            return r.get("status", "unknown")
-        except AttributeError:
-            return "unknown"
-
-
-    """
-    def render(self, output_folder, **context):
-        ctxt = self.get_context(**context)
-
-        # detail
-        detail_filename = os.path.join(output_folder, self.url)
-        templates.render('html/recipe_detail.html', context=ctxt, output_file=detail_filename)
-
-        # conanfile
-        conanfile_html = os.path.join(output_folder, self._repo.name + '_conanfile.html')
-        ctxt.update({'file': self.conanfile})
-        templates.render('html/recipe_detail_file.html', context=ctxt, output_file=conanfile_html)
-
-        # readme
-        readme_html = os.path.join(output_folder, self._repo.name + '_readme.html')
-        ctxt.update({'file': self.readme})
-        templates.render('html/recipe_detail_file.html', context=ctxt, output_file=readme_html)
-
-        return detail_filename
-    """
+            return r.get("status", "unknown"), r['url']
+        except Exception as e:
+            return None, None
 
 
 if __name__ == "__main__":

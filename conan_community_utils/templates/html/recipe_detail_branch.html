@@ -1,0 +1,28 @@
+{% extends 'html/recipe_detail.html' %}
+
+{% block content_detail %}
+    <h4>Build status</h4>
+    <p>TODO: Parse appveyor.yml and .travis.yml to know if we are building all expected configurations.</p>
+
+    {% set status, url = recipe.get_travis_status(branch=recipe.active_branch) %}
+    <p>Travis: <a href="{{ url }}"><img alt="{{ status }}" src="https://travis-ci.org/{{ recipe.full_name }}.svg?branch={{ recipe.active_branch }}"/></a></p>
+
+    {% set status, url = recipe.get_appveyor_status(branch=recipe.active_branch) %}
+    <p>Appveyor: <a href="{{ url }}"><img alt="{{ status }}" src="https://ci.appveyor.com/api/projects/status/github/{{ recipe.full_name }}?branch={{ recipe.active_branch }}&svg=true"/></a></p>
+
+    <h4>Metadata</h4>
+    {% set conanfile = recipe.get_conanfile(branch=recipe.active_branch) %}
+    <table class="table">
+        <thead>
+            <tr><th scope="col"></th><th scope="col">Bintray</th><th scope="col">{{ recipe.active_branch }}</th></tr>
+        </thead>
+        <tbody>
+            <tr><th scope="row">name</th><td></td><td>{{ conanfile._attribs.name }}</td></tr>
+            <tr><th scope="row">version</th><td></td><td>{{ conanfile._attribs.version }}</td></tr>
+            <tr><th scope="row">url</th><td></td><td>{{ conanfile._attribs.url }}</td></tr>
+            <tr><th scope="row">homepage</th><td></td><td>{{ conanfile._attribs.homepage }}</td></tr>
+            <tr><th scope="row">topics</th><td></td><td>{{ conanfile._attribs.topics }}</td></tr>
+            <tr><th scope="row">license</th><td></td><td>{{ conanfile._attribs.license }}</td></tr>
+        </tbody>
+    </table>
+{% endblock %}

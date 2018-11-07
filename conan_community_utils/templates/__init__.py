@@ -2,6 +2,7 @@
 import os
 import shutil
 import codecs
+import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
@@ -11,6 +12,7 @@ env = Environment(loader=PackageLoader('conan_community_utils', 'templates'),
 
 def render(candidates, context, output_file=None):
     template = env.get_template(candidates)
+    template.globals['now'] = datetime.datetime.utcnow
     output = template.render(**context)
     if output_file:
         os.makedirs(os.path.dirname(output_file), exist_ok=True)

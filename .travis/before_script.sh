@@ -6,7 +6,7 @@ setup_git() {
 }
 
 checkout_web() {
-  git clone https://${GH_TOKEN}@github.com/jgsogo/conan-community-web.git ../web > /dev/null 2>&1
+  git clone https://${GITHUB_TOKEN}@github.com/jgsogo/conan-community-web.git ../web > /dev/null 2>&1
 }
 
 setup_git

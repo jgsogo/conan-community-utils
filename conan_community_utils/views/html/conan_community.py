@@ -62,17 +62,29 @@ def generate_html(name, output_folder, base_url, force=False):
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Generate HTML.')
+    parser.add_argument('--base_url', help='url path', required=True)
+
+    args = parser.parse_args()
+
+
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
 
     name = 'conan-community'
+    base_url = args.base_url
+    target_branch = 'master'
     output_folder = os.path.join(me, '..', '..', '..', 'tmp', 'html')
-    base_url = output_folder + "/"
+    #base_url = output_folder + "/"
     force = True
 
     index = generate_html(name, output_folder, base_url, force)
 
-
+    gh = Github(os.getenv("GITHUB_TOKEN"))
+    repo = gh.get_repo("jgsogo/conan-community-web")
+    repo.create_file("")
 
 

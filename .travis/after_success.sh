@@ -5,7 +5,7 @@ commit_website_files() {
   pwd
   ls -la
   git rm -r *
-  cp -R ../tmp .
+  cp -R ../tmp/* .
   git add .
   git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
 }

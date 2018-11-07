@@ -82,9 +82,3 @@ if __name__ == '__main__':
     force = True
 
     index = generate_html(name, output_folder, base_url, force)
-
-    gh = Github(os.getenv("GITHUB_TOKEN"))
-    repo = gh.get_repo("jgsogo/conan-community-web")
-    repo.create_file("")
-
-

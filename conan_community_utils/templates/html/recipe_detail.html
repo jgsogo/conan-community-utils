@@ -5,8 +5,9 @@
 <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group mr-2">
         <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.github_url }}" role="button">Github <span data-feather="external-link"></span></a>
-        {% if recipe.bintray %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.bintray.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
+        {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
+        {% if bintray_pck %}
+            <a class="btn btn-sm btn-outline-secondary" href="{{ bintray_pck.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
         {% endif %}
     </div>
     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" id="branchesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -36,6 +37,7 @@
     <p>license: {{ recipe._repo.get_license() }}</p>
 
     <h4>Common from Bintray</h4>
-
+    {% set bintray_repo=recipe.get_bintray_repo() %}
+    {{ bintray_repo }}
 {% endblock %}
 

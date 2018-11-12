@@ -56,8 +56,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
     def get_context(self, **context):
         context = super(RecipeHTML, self).get_context(**context)
         context.update({'recipe': self,
-                        'organization': self._organization,
-                        'travis': self.travis})
+                        'organization': self._organization, })
         return context
 
     def render(self, output_folder):

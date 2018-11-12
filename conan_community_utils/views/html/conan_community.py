@@ -59,7 +59,8 @@ def generate_html(name, output_folder, base_url, force=False):
             log.info("Rendering recipe '{}'".format(recipe))
             recipe.render(output_folder=output_folder)
         except Exception as e:
-            log.error(f">> ERROR rendering recipe '{recipe}': {e}")
+            log.error(f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}")
+            raise
 
     return index
 

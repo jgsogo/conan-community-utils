@@ -1,13 +1,22 @@
 language: python
 python:
   - "3.6"
+
+#safelist
+branches:
+  only:
+  - dev
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+
 before_script:
   - .travis/before_script.sh
+
 # command to run tests
 script:
   - python -m conan_community_utils.views.html.conan_community --base_url=https://jgsogo.es/conan-community-web/
+
 after_success:
   - .travis/after_success.sh

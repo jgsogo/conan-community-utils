@@ -5,6 +5,7 @@ from github.Repository import Repository as github_Repository
 
 from conan_community_utils.models.travis import Travis
 from conan_community_utils.models.appveyor import Appveyor
+from conan_community_utils.models.bintray import Bintray
 from conan_community_utils.utils.file_view import FileView
 from conan_community_utils.models.github.conanfile import ConanFile
 
@@ -19,6 +20,7 @@ class Recipe(object):
 
     travis = Travis(token=os.getenv("TRAVIS_TOKEN"))
     appveyor = Appveyor(token=os.getenv("APPVEYOR_TOKEN"))
+    bintray = Bintray(api_token=os.getenv("BINTRAY_TOKEN"), api_username=os.getenv("BINTRAY_USERNAME"))
 
     def __init__(self, repo):
         assert isinstance(repo, github_Repository)
@@ -61,8 +63,11 @@ class Recipe(object):
         return readme
 
     def get_travis_status(self, branch):
-        r = self.travis.get_last_build(self.full_name, branch=branch)
-        return r.get("state", "unknown"), r['url']
+        try:
+            r = self.travis.get_last_build(self.full_name, branch=branch)
+            return r.get("state", "unknown"), r['url']
+        except Exception as e:
+            return None, None
 
     def get_appveyor_status(self, branch):
         try:
@@ -70,6 +75,24 @@ class Recipe(object):
             return r.get("status", "unknown"), r['url']
         except Exception as e:
             return None, None
+
+    def get_bintray_repo(self):
+        try:
+            _, id = self.id.split('-')
+            return self.bintray.get_repository(name=id, user='conan')
+        except:
+            return None
+
+    def get_bintray_package(self, branch):
+        try:
+            if self.is_release_branch(branch):
+                _, version = branch.split('/')
+                _, id = self.id.split('-')
+                return self.bintray.get_package(name=id, version=version, user='conan', channel='stable')
+            else:
+                return None
+        except Exception:
+            return None
 
 
 if __name__ == "__main__":

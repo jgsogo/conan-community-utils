@@ -9,6 +9,9 @@ from conan_community_utils.models.bintray import Bintray
 from conan_community_utils.utils.file_view import FileView
 from conan_community_utils.models.github.conanfile import ConanFile
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class Readme(FileView):
     name = "README.md"
@@ -54,14 +57,29 @@ class Recipe(object):
         return [branch.name for branch in self._repo.get_branches()]
 
     def get_conanfile(self, branch):
-        content = self._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
-        conanfile = ConanFile(content=content)
-        return conanfile
+        try:
+            content = self._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
+            conanfile = ConanFile(content=content)
+            return conanfile
+        except Exception as e:
+            log.error(f"Cannot retrieve 'conanfile.py' from branch {branch}: ({type(e)}) {e}")
+            return None
 
     def get_readme(self, branch):
-        content = self._repo.get_contents("README.md", ref=branch).decoded_content.decode("utf-8")
-        readme = Readme(content=content)
-        return readme
+        try:
+            content = self._repo.get_contents("README.md", ref=branch).decoded_content.decode("utf-8")
+            readme = Readme(content=content)
+            return readme
+        except Exception as e:
+            log.error(f"Cannot retrieve 'README.md' from branch {branch}: ({type(e)}) {e}")
+            return None
+
+    def get_license(self):
+        try:
+            return self._repo.get_license()
+        except Exception as e:
+            log.error(f"Cannot retrieve license: ({type(e)}) {e}")
+            return None
 
     def get_travis_status(self, branch):
         try:

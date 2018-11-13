@@ -54,54 +54,57 @@
 
     <h4>Github project -vs- Bintray</h4>
     {% set bintray_repo=recipe.get_bintray_repo() %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Github</th>
-                <th scope="col">Bintray</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">name</th>
-                <td>{{ recipe._repo.name }}</td>
-                <td>{{ bintray_repo.name }}</td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    description
-                    {{ error_eq(recipe._repo.description, bintray_repo.desc) }}
-                </th>
-                <td>{{ recipe._repo.description }}</td>
-                <td>{{ bintray_repo.desc }}</td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    homepage
-                    {{ error_eq(recipe._repo.homepage, bintray_repo.website_url) }}
-                </th>
-                <td>{{ recipe._repo.homepage }}</td>
-                <td>{{ bintray_repo.website_url }}</td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    topics
-                    {{ error_eq(recipe._repo.get_topics(), bintray_repo.labels) }}
-                </th>
-                <td>{{ recipe._repo.get_topics() }}</td>
-                <td>{{ bintray_repo.labels }}</td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    license
-                    {{ error_eq(recipe._repo.get_license(), bintray_repo.licenses) }}
-                </th>
-                <td>{{ recipe._repo.get_license() }}</td>
-                <td>{{ bintray_repo.licenses }}</td>
-            </tr>
-        </tbody>
-    </table>
-
+    {% if bintray_repo %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Github</th>
+                    <th scope="col">Bintray</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">name</th>
+                    <td>{{ recipe._repo.name }}</td>
+                    <td>{{ bintray_repo.name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        description
+                        {{ error_eq(recipe._repo.description, bintray_repo.desc) }}
+                    </th>
+                    <td>{{ recipe._repo.description }}</td>
+                    <td>{{ bintray_repo.desc }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        homepage
+                        {{ error_eq(recipe._repo.homepage, bintray_repo.website_url) }}
+                    </th>
+                    <td>{{ recipe._repo.homepage }}</td>
+                    <td>{{ bintray_repo.website_url }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        topics
+                        {{ error_eq(recipe._repo.get_topics(), bintray_repo.labels) }}
+                    </th>
+                    <td>{{ recipe._repo.get_topics() }}</td>
+                    <td>{{ bintray_repo.labels }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        license
+                        {{ error_eq(recipe.get_license(), bintray_repo.licenses) }}
+                    </th>
+                    <td>{{ recipe.get_license() }}</td>
+                    <td>{{ bintray_repo.licenses }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <p>Error retrieving bintray_repo.</p>
+    {% endif %}
 {% endblock %}
 

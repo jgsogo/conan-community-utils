@@ -49,13 +49,14 @@ def generate_html(name, output_folder, base_url, force=False):
     # Get organization
     org = gh.get_organization(login=name)
     org = OrganizationHTML(github_org=org, base_url=base_url)
+    all_recipes = org.get_recipes()
 
     errors = []
-    for recipe in org.get_recipes():
+    for recipe in all_recipes:
         try:
             rate_limits(gh, raise_at=500)
             log.info("Rendering recipe '{}'".format(recipe))
-            recipe.render(output_folder=output_folder)
+            recipe.render(output_folder=output_folder, all_recipes=all_recipes)
         except Exception as e:
             msg = f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}"
             errors.append([str(recipe), msg])
@@ -63,7 +64,7 @@ def generate_html(name, output_folder, base_url, force=False):
             import traceback
             traceback.print_exc()
 
-    index = org.render(output_folder=output_folder, errors=errors)
+    index = org.render(output_folder=output_folder, errors=errors, all_recipes=all_recipes)
     log.info("HTML index: {}".format(index))
 
     return index

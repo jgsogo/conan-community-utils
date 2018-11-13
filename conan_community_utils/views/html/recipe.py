@@ -118,10 +118,12 @@ class RecipeHTML(HTMLMixin, github.Recipe):
 
         return ret
 
+    @functools.lru_cache()
     def count_errors(self, branch=None):
         all = self._grab_warnings(branch=branch)
         return sum([1 for level, branch, msg in all if level == 'error'])
 
+    @functools.lru_cache()
     def count_warnings(self, branch=None):
         all = self._grab_warnings(branch=branch)
         return sum([1 for level, branch, msg in all if level == 'warning'])
@@ -138,13 +140,13 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                         'organization': self._organization, })
         return context
 
-    def render(self, output_folder):
+    def render(self, output_folder, **context):
         log.debug(f"Render recipe detail '{self.id}'")
-        html = super().render(output_folder=output_folder)
+        html = super().render(output_folder=output_folder, **context)
 
         for branch in self.get_branches():
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
-            super().render(output_folder=output_folder)
+            super().render(output_folder=output_folder, **context)
         self.active_branch = None
         return html

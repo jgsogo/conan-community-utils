@@ -12,7 +12,7 @@
         <a class="d-flex align-items-center text-muted" href="#"></a>
       </h6>
       <ul class="nav flex-column">
-        {% for recipe in organization.get_recipes() %}
+        {% for recipe in all_recipes %}
             <li class="nav-item">
               <a class="nav-link" href="{{ recipe.get_url(branch=False) }}">
                 <span data-feather="file-text"></span>

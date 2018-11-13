@@ -24,8 +24,6 @@ class RecipeHTML(HTMLMixin, github.Recipe):
     def __init__(self, organization, *args, **kwargs):
         super(RecipeHTML, self).__init__(*args, **kwargs)
         self._organization = organization
-        self.branches = self.get_branches()  # [br for br in self.get_branches() if github.Recipe.is_release_branch(br)]
-        self.main_branch = self.branches[0]
         self.active_branch = None
 
     @property
@@ -66,7 +64,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                 ret.append(['warning', None, 'Remove projects tab from Github'])
             if self._repo.has_wiki:
                 ret.append(['warning', None, 'Remove wiki tab from Github'])
-            if not self._repo.get_topics():
+            if not self.get_topics():
                 ret.append(['warning', None, "Add topics to Github repository"])
             if not self._repo.homepage:
                 ret.append(['warning', None, "Add homepage of underlying library"])
@@ -80,7 +78,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                     ret.append(['error', None, "Description in Github and Bintray doesn't match"])
                 if self._repo.homepage != bintray_repo["website_url"]:
                     ret.append(['error', None, "Homepage in Github and Bintray doesn't match"])
-                if self._repo.get_topics() != bintray_repo["labels"]:
+                if self.get_topics() != bintray_repo["labels"]:
                     ret.append(['error', None, "Topics in Github doesn't match labels in Bintray"])
                 if self.get_license() != bintray_repo["licenses"]:
                     ret.append(['error', None, "License in Github and Bintray doesn't match"])

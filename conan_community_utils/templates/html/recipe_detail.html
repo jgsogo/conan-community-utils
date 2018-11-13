@@ -90,9 +90,9 @@
                 <tr>
                     <th scope="row" class="text-nowrap">
                         topics
-                        {{ error_eq(recipe._repo.get_topics(), bintray_repo.labels) }}
+                        {{ error_eq(recipe.get_topics(), bintray_repo.labels) }}
                     </th>
-                    <td>{{ recipe._repo.get_topics() }}</td>
+                    <td>{{ recipe.get_topics() }}</td>
                     <td>{{ bintray_repo.labels }}</td>
                 </tr>
                 <tr>

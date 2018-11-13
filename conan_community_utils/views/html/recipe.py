@@ -47,6 +47,28 @@ class RecipeHTML(HTMLMixin, github.Recipe):
             detail_url = self.detail_url.format(self=self, branch="index")
             return detail_url
 
+    def get_github_url(self, branch=None):
+        branch = branch if branch is not None else self.active_branch
+        if branch:
+            return '/'.join([self._repo.html_url, 'tree', branch])
+        else:
+            return self._repo.html_url
+
+    def has_errors(self, branch=None):
+        branch = branch if branch is not None else self.active_branch
+        if branch:
+            return True
+        else:
+            return True
+        return False
+
+    def has_warnings(self, branch=None):
+        if branch:
+            return True
+        else:
+            return True
+        return False
+
     def get_template_name(self):
         if self.active_branch:
             return 'html/recipe_detail_branch.html'

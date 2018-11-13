@@ -4,7 +4,10 @@
 {% block content_toolbar %}
 <div class="btn-toolbar mb-2 mb-md-0">
     <div class="btn-group mr-2">
-        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.github_url }}" role="button">Github <span data-feather="external-link"></span></a>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.get_url(branch=False) }}" role="button">Index <span data-feather="home"></span></a>
+    </div>
+    <div class="btn-group mr-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.get_github_url() }}" role="button">Github <span data-feather="external-link"></span></a>
         {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
         {% if bintray_pck %}
             <a class="btn btn-sm btn-outline-secondary" href="{{ bintray_pck.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
@@ -20,24 +23,85 @@
     </button>
     <div class="dropdown-menu" aria-labelledby="branchesMenuButton">
         {% for branch in recipe.get_branches() %}
-            <a class="dropdown-item" href="{{ recipe.get_url(branch=branch) }}">{{ branch }}</a>
+            <a class="dropdown-item" href="{{ recipe.get_url(branch=branch) }}">
+                {{ branch }}
+                {{ error_false(recipe.has_errors(branch=branch)) }}
+                {{ warning_false(recipe.has_warnings(branch=branch)) }}
+            </a>
         {% endfor %}
     </div>
 </div>
 {% endblock %}
 
 {% block content_detail %}
-    <h4>Common to every branch (from Github)</h4>
-    <p>description: {{ recipe._repo.description }}</p>
-    <p>has issues: {{ recipe._repo.has_issues }}</p>
-    <p>has projects: {{ recipe._repo.has_projects }}</p>
-    <p>has wiki: {{ recipe._repo.has_wiki }}</p>
-    <p>homepage: {{ recipe._repo.homepage }}</p>
-    <p>topics: {{ recipe._repo.get_topics() }}</p>
-    <p>license: {{ recipe._repo.get_license() }}</p>
+    <h4>Github project configuration:</h4>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td>Issues {{ error_false(recipe._repo.has_issues, "No issues in project repositories") }}</td>
+                <td>{{ recipe._repo.has_issues }}</td>
+            </tr>
+            <tr>
+                <td>Projects {{ warning_false(recipe._repo.has_projects, "No projects in repositories") }}</td>
+                <td>{{ recipe._repo.has_projects }}</td>
+            </tr>
+            <tr>
+                <td>Wiki {{ warning_false(recipe._repo.has_wiki, "No wiki in repositories") }}</td>
+                <td>{{ recipe._repo.has_wiki }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-    <h4>Common from Bintray</h4>
+    <h4>Github project -vs- Bintray</h4>
     {% set bintray_repo=recipe.get_bintray_repo() %}
-    {{ bintray_repo }}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Github</th>
+                <th scope="col">Bintray</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">name</th>
+                <td>{{ recipe._repo.name }}</td>
+                <td>{{ bintray_repo.name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    description
+                    {{ error_eq(recipe._repo.description, bintray_repo.desc) }}
+                </th>
+                <td>{{ recipe._repo.description }}</td>
+                <td>{{ bintray_repo.desc }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    homepage
+                    {{ error_eq(recipe._repo.homepage, bintray_repo.website_url) }}
+                </th>
+                <td>{{ recipe._repo.homepage }}</td>
+                <td>{{ bintray_repo.website_url }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    topics
+                    {{ error_eq(recipe._repo.get_topics(), bintray_repo.labels) }}
+                </th>
+                <td>{{ recipe._repo.get_topics() }}</td>
+                <td>{{ bintray_repo.labels }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    license
+                    {{ error_eq(recipe._repo.get_license(), bintray_repo.licenses) }}
+                </th>
+                <td>{{ recipe._repo.get_license() }}</td>
+                <td>{{ bintray_repo.licenses }}</td>
+            </tr>
+        </tbody>
+    </table>
+
 {% endblock %}
 

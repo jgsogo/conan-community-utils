@@ -35,7 +35,8 @@ class Recipe(object):
 
     @classmethod
     def is_release_branch(cls, branch_name):
-        return bool(re.match(r"release/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch_name))
+        return bool(re.match(r"release/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch_name)) or \
+               bool(re.match(r"stable/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch_name))
 
     @property
     def id(self):
@@ -45,9 +46,9 @@ class Recipe(object):
     def full_name(self):
         return self._repo.full_name
 
-    @property
-    def github_url(self):
-        return self._repo.html_url  # TODO: git_url
+    #@property
+    #def github_url(self):
+    #    return self._repo.html_url  # TODO: git_url
 
     def get_branches(self):
         return [branch.name for branch in self._repo.get_branches()]

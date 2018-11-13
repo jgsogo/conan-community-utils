@@ -60,6 +60,8 @@ def generate_html(name, output_folder, base_url, force=False):
             recipe.render(output_folder=output_folder)
         except Exception as e:
             log.error(f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}")
+            import traceback
+            traceback.print_exc()
 
     return index
 
@@ -73,7 +75,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
 

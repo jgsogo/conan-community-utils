@@ -2,7 +2,13 @@
 
 {% block content_detail %}
     <h4>Build status</h4>
-    <p>TODO: Parse appveyor.yml and .travis.yml to know if we are building all expected configurations.</p>
+
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>TODO:</strong> Parse appveyor.yml and .travis.yml to know if we are building all expected configurations (show as matrix).
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
 
     {% set status, url = recipe.get_travis_status(branch=recipe.active_branch) %}
     <p>Travis: <a href="{{ url }}"><img alt="{{ status }}" src="https://travis-ci.org/{{ recipe.full_name }}.svg?branch={{ recipe.active_branch }}"/></a></p>
@@ -12,17 +18,71 @@
 
     <h4>Metadata</h4>
     {% set conanfile = recipe.get_conanfile(branch=recipe.active_branch) %}
+    {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
+    {% set bintray_repo=recipe.get_bintray_repo() %}
     <table class="table">
         <thead>
-            <tr><th scope="col"></th><th scope="col">Bintray</th><th scope="col">{{ recipe.active_branch }}</th></tr>
+            <tr><th scope="col"></th>
+                <th scope="col">Bintray</th>
+                <th scope="col">conanfile.py @ {{ recipe.active_branch }}</th></tr>
         </thead>
         <tbody>
-            <tr><th scope="row">name</th><td></td><td>{{ conanfile._attribs.name }}</td></tr>
-            <tr><th scope="row">version</th><td></td><td>{{ conanfile._attribs.version }}</td></tr>
-            <tr><th scope="row">url</th><td></td><td>{{ conanfile._attribs.url }}</td></tr>
-            <tr><th scope="row">homepage</th><td></td><td>{{ conanfile._attribs.homepage }}</td></tr>
-            <tr><th scope="row">topics</th><td></td><td>{{ conanfile._attribs.topics }}</td></tr>
-            <tr><th scope="row">license</th><td></td><td>{{ conanfile._attribs.license }}</td></tr>
+            <tr>
+                <th scope="row">
+                    name
+                    {{ error_eq(bintray_pck.name, conanfile._attribs.name) }}
+                </th>
+                <td>{{ bintray_pck.name }}</td>
+                <td>{{ conanfile._attribs.name }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    version
+                    {{ error_eq(bintray_pck.version, conanfile._attribs.version) }}
+                </th>
+                <td>{{ bintray_pck.version }}</td>
+                <td>{{ conanfile._attribs.version }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    url
+                    {{ error_eq(bintray_pck.vcs_url, conanfile._attribs.url) }}
+                </th>
+                <td>{{ bintray_repo.vcs_url }}</td>
+                <td>{{ conanfile._attribs.url }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    homepage
+                    {{ error_eq(bintray_repo.website_url, conanfile._attribs.homepage) }}
+                </th>
+                <td>{{ bintray_repo.website_url }}</td>
+                <td>{{ conanfile._attribs.homepage }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    topics
+                    {{ error_eq(bintray_repo.labels, conanfile._attribs.topics) }}
+                </th>
+                <td>{{ bintray_repo.labels }}</td>
+                <td>{{ conanfile._attribs.topics }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    license
+                    {{ error_eq(bintray_repo.licenses, conanfile._attribs.license) }}
+                </th>
+                <td>{{ bintray_repo.licenses }}</td>
+                <td>{{ conanfile._attribs.license }}</td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    description
+                    {{ warning_eq(bintray_repo.desc, conanfile._attribs.description) }}
+                </th>
+                <td>{{ bintray_repo.desc }}</td>
+                <td>{{ conanfile._attribs.description }}</td>
+            </tr>
         </tbody>
     </table>
 {% endblock %}

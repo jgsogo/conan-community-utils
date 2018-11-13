@@ -17,6 +17,8 @@
               <a class="nav-link" href="{{ recipe.get_url(branch=False) }}">
                 <span data-feather="file-text"></span>
                 {{ recipe }}
+                {{ error_false(recipe.has_errors()) }}
+                {{ warning_false(recipe.has_warnings()) }}
               </a>
             </li>
         {% endfor %}
@@ -41,10 +43,9 @@
       html/organization_detail.html -- This could be a dashboard
       TODO: Notify about issues.
     {% endblock %}
-
-    <pre><code>
-      {{ object.dump() }}
-    </code></pre>
-    Generation done at {{ now() }}
   </main>
+{% endblock %}
+
+{% block footer %}
+  <span class="text-muted">Generation done at {{ now() }}</span> | Work in progress
 {% endblock %}

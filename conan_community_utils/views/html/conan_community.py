@@ -1,6 +1,7 @@
 
 import os
 import shutil
+from datetime import datetime, timedelta
 
 from github import Github
 
@@ -15,22 +16,19 @@ log = logging.getLogger(__name__)
 me = os.path.dirname(__file__)
 
 
-def rate_limits(g):
+def rate_limits(g, raise_at=500):
     rates = g.rate_limiting
-    if rates[0] < 4000:
-        print("Rate limits!!!")
-        print("Calls: {}".format(g.rate_limiting))
-        from datetime import datetime
-        print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
-        print("now: {}".format(datetime.now()))
-    if rates[0] == 0:
-        exit(0)
+    reset_in = datetime.fromtimestamp(g.rate_limiting_resettime)-datetime.now()
+    reset_in = reset_in - timedelta(microseconds=reset_in.microseconds)
+    log.info(f"Rate limit: {rates[0]}/{rates[1]} (reset in {reset_in})")
+    if raise_at and rates[0] <= raise_at:
+        raise RuntimeError(f"Rate limit under {raise_at}!")
 
 
 def generate_html(name, output_folder, base_url, force=False):
     # Get access to Github (do not delete things before checking credentials)
     gh = Github(os.getenv("GITHUB_TOKEN"))
-    rate_limits(gh)
+    rate_limits(gh, raise_at=100)
     log.debug("Authenticated in Github as user '{}".format(gh.get_user().name))
 
     # Work on output folder
@@ -55,6 +53,7 @@ def generate_html(name, output_folder, base_url, force=False):
     errors = []
     for recipe in org.get_recipes():
         try:
+            rate_limits(gh, raise_at=500)
             log.info("Rendering recipe '{}'".format(recipe))
             recipe.render(output_folder=output_folder)
         except Exception as e:

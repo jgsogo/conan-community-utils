@@ -68,5 +68,5 @@
 {% endblock %}
 
 {% block footer %}
-  <span class="text-muted">Generation done at {{ now() }}</span> | Work in progress
+  <span class="text-muted">Generation done at {{ now().replace(microsecond=0) }}</span> | Work in progress
 {% endblock %}

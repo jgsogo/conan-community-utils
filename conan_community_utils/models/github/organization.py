@@ -25,7 +25,6 @@ class Organization(object):
 
     def get_recipes(self):
         if not hasattr(self, '_get_recipes'):
-            print("!"*20)
             ret = []
             for repo in self._github_org.get_repos('all'):
                 if Recipe.is_recipe(repo.name):

@@ -30,7 +30,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         name
                         {{ error_eq(bintray_pck.name, conanfile._attribs.name) }}
                     </th>
@@ -38,7 +38,7 @@
                     <td>{{ conanfile._attribs.name }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         version
                         {{ error_eq(bintray_pck.version, conanfile._attribs.version) }}
                     </th>
@@ -46,7 +46,7 @@
                     <td>{{ conanfile._attribs.version }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         url
                         {{ error_eq(bintray_pck.vcs_url, conanfile._attribs.url) }}
                     </th>
@@ -54,7 +54,7 @@
                     <td>{{ conanfile._attribs.url }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         homepage
                         {{ error_eq(bintray_repo.website_url, conanfile._attribs.homepage) }}
                     </th>
@@ -62,7 +62,7 @@
                     <td>{{ conanfile._attribs.homepage }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         topics
                         {{ error_eq(bintray_repo.labels, conanfile._attribs.topics) }}
                     </th>
@@ -70,7 +70,7 @@
                     <td>{{ conanfile._attribs.topics }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         license
                         {{ error_eq(bintray_repo.licenses, conanfile._attribs.license) }}
                     </th>
@@ -78,7 +78,7 @@
                     <td>{{ conanfile._attribs.license }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         description
                         {{ warning_eq(bintray_repo.desc, conanfile._attribs.description) }}
                     </th>

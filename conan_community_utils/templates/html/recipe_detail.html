@@ -72,7 +72,7 @@
                     <td>{{ bintray_repo.name }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         description
                         {{ error_eq(recipe._repo.description, bintray_repo.desc) }}
                     </th>
@@ -80,7 +80,7 @@
                     <td>{{ bintray_repo.desc }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         homepage
                         {{ error_eq(recipe._repo.homepage, bintray_repo.website_url) }}
                     </th>
@@ -88,7 +88,7 @@
                     <td>{{ bintray_repo.website_url }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         topics
                         {{ error_eq(recipe._repo.get_topics(), bintray_repo.labels) }}
                     </th>
@@ -96,7 +96,7 @@
                     <td>{{ bintray_repo.labels }}</td>
                 </tr>
                 <tr>
-                    <th scope="row">
+                    <th scope="row" class="text-nowrap">
                         license
                         {{ error_eq(recipe.get_license(), bintray_repo.licenses) }}
                     </th>

@@ -64,7 +64,7 @@ class Recipe(object):
             conanfile = ConanFile(content=content)
             return conanfile
         except Exception as e:
-            log.error(f"Cannot retrieve 'conanfile.py' from branch {branch}: ({type(e)}) {e}")
+            log.error(f"Cannot retrieve 'conanfile.py' (repo {self.full_name}) from branch {branch}: ({type(e)}) {e}")
             return None
 
     @functools.lru_cache()
@@ -74,7 +74,7 @@ class Recipe(object):
             readme = Readme(content=content)
             return readme
         except Exception as e:
-            log.error(f"Cannot retrieve 'README.md' from branch {branch}: ({type(e)}) {e}")
+            log.error(f"Cannot retrieve 'README.md' (repo {self.full_name}) from branch {branch}: ({type(e)}) {e}")
             return None
 
     @functools.lru_cache()
@@ -82,7 +82,7 @@ class Recipe(object):
         try:
             return self._repo.get_license()
         except Exception as e:
-            log.error(f"Cannot retrieve license: ({type(e)}) {e}")
+            log.error(f"Cannot retrieve license (repo {self.full_name}): ({type(e)}) {e}")
             return None
 
     @functools.lru_cache()

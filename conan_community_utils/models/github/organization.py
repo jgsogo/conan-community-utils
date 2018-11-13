@@ -26,7 +26,7 @@ class Organization(object):
     @functools.lru_cache()
     def get_recipes(self):
         ret = []
-        for repo in self._github_org.get_repos('all')[:3]:
+        for repo in self._github_org.get_repos('all'):
             if Recipe.is_recipe(repo.name):
                 ret.append(self.RecipeClass(repo=repo))
             else:

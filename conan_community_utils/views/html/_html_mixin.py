@@ -36,10 +36,10 @@ class HTMLMixin(object):
             raise RuntimeError("No 'self.template_name' given or self.get_template_name() overriden")
         return self.template_name
 
-    def render(self, output_folder):
+    def render(self, output_folder, **context):
         output_filename = os.path.join(output_folder, self.get_detail_url())
         template_name = self.get_template_name()
-        templates.render(template_name, context=self.get_context(),
+        templates.render(template_name, context=self.get_context(**context),
                          output_file=output_filename)
         log.debug(f"> Generated '{output_filename}'")
         return output_filename

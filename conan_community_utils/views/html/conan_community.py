@@ -51,17 +51,21 @@ def generate_html(name, output_folder, base_url, force=False):
     # Get organization
     org = gh.get_organization(login=name)
     org = OrganizationHTML(github_org=org, base_url=base_url)
-    index = org.render(output_folder=output_folder)
-    log.info("HTML index: {}".format(index))
 
+    errors = []
     for recipe in org.get_recipes():
         try:
             log.info("Rendering recipe '{}'".format(recipe))
             recipe.render(output_folder=output_folder)
         except Exception as e:
-            log.error(f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}")
+            msg = f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}"
+            errors.append([str(recipe), msg])
+            log.error(msg)
             import traceback
             traceback.print_exc()
+
+    index = org.render(output_folder=output_folder, errors=errors)
+    log.info("HTML index: {}".format(index))
 
     return index
 

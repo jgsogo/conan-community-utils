@@ -44,7 +44,26 @@
     {% block content_detail %}
       html/organization_detail.html -- This could be a dashboard
       TODO: Notify about issues.
+
+      {% if errors %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Recipe</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        {% for recipe, error in errors %}
+          <tr>
+            <td>{{ recipe }}</td>
+            <td>{{ error }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
     {% endblock %}
+
   </main>
 {% endblock %}
 

@@ -23,12 +23,13 @@ class Organization(object):
     def id(self):
         return self._github_org.name
 
-    @functools.lru_cache()
     def get_recipes(self):
-        ret = []
-        for repo in self._github_org.get_repos('all'):
-            if Recipe.is_recipe(repo.name):
-                ret.append(self.RecipeClass(repo=repo))
-            else:
-                log.debug("Repository '{}/{}' discarded as recipe".format(self, repo.name))
-        return ret
+        if not hasattr(self, '_get_recipes'):
+            ret = []
+            for repo in self._github_org.get_repos('all'):
+                if Recipe.is_recipe(repo.name):
+                    ret.append(self.RecipeClass(repo=repo))
+                else:
+                    log.debug("Repository '{}/{}' discarded as recipe".format(self, repo.name))
+            setattr(self, '_get_recipes', ret)
+        return getattr(self, '_get_recipes')

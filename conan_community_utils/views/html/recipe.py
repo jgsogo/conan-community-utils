@@ -82,7 +82,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                     ret.append(['error', None, "Homepage in Github and Bintray doesn't match"])
                 if self._repo.get_topics() != bintray_repo["labels"]:
                     ret.append(['error', None, "Topics in Github doesn't match labels in Bintray"])
-                if self._repo.get_license() != bintray_repo["licenses"]:
+                if self.get_license() != bintray_repo["licenses"]:
                     ret.append(['error', None, "License in Github and Bintray doesn't match"])
 
         elif branch is None:

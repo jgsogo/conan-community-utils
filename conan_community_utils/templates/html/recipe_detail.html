@@ -25,8 +25,10 @@
         {% for branch in recipe.get_branches() %}
             <a class="dropdown-item" href="{{ recipe.get_url(branch=branch) }}">
                 {{ branch }}
-                {{ error_false(recipe.has_errors(branch=branch)) }}
-                {{ warning_false(recipe.has_warnings(branch=branch)) }}
+                {% set n_errors = recipe.count_errors(branch=branch) %}
+                {% if n_errors %}<span class="numberCircle numberCircle-error"><span>{{ n_errors }}</span></span>{% endif %}
+                {% set n_warnings = recipe.count_warnings(branch=branch) %}
+                {% if n_warnings %}<span class="numberCircle numberCircle-warning"><span>{{ n_warnings }}</span></span>{% endif %}
             </a>
         {% endfor %}
     </div>
@@ -106,5 +108,16 @@
     {% else %}
         <p>Error retrieving bintray_repo.</p>
     {% endif %}
+
+    <h4>Summary of errors</h4>
+    <table class="table">
+    {% for level, branch, msg in recipe._grab_warnings(branch=None) %}
+        <tr>
+            <td>{{ level }}</td>
+            <td>{{ branch }}</td>
+            <td>{{ msg }}</td>
+        </tr>
+    {% endfor %}
+    </table>
 {% endblock %}
 

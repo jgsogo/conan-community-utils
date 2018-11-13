@@ -17,8 +17,10 @@
               <a class="nav-link" href="{{ recipe.get_url(branch=False) }}">
                 <span data-feather="file-text"></span>
                 {{ recipe }}
-                {{ error_false(recipe.has_errors()) }}
-                {{ warning_false(recipe.has_warnings()) }}
+                {% set n_errors = recipe.count_errors() %}
+                {% if n_errors %}<span class="numberCircle numberCircle-error"><span>{{ n_errors }}</span></span>{% endif %}
+                {% set n_warnings = recipe.count_warnings() %}
+                {% if n_warnings %}<span class="numberCircle numberCircle-warning"><span>{{ n_warnings }}</span></span>{% endif %}
               </a>
             </li>
         {% endfor %}

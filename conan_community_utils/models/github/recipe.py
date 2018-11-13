@@ -1,6 +1,7 @@
 
 import os
 import re
+import functools
 from github.Repository import Repository as github_Repository
 
 from conan_community_utils.models.travis import Travis
@@ -56,6 +57,7 @@ class Recipe(object):
     def get_branches(self):
         return [branch.name for branch in self._repo.get_branches()]
 
+    @functools.lru_cache()
     def get_conanfile(self, branch):
         try:
             content = self._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
@@ -65,6 +67,7 @@ class Recipe(object):
             log.error(f"Cannot retrieve 'conanfile.py' from branch {branch}: ({type(e)}) {e}")
             return None
 
+    @functools.lru_cache()
     def get_readme(self, branch):
         try:
             content = self._repo.get_contents("README.md", ref=branch).decoded_content.decode("utf-8")
@@ -74,6 +77,7 @@ class Recipe(object):
             log.error(f"Cannot retrieve 'README.md' from branch {branch}: ({type(e)}) {e}")
             return None
 
+    @functools.lru_cache()
     def get_license(self):
         try:
             return self._repo.get_license()
@@ -81,6 +85,7 @@ class Recipe(object):
             log.error(f"Cannot retrieve license: ({type(e)}) {e}")
             return None
 
+    @functools.lru_cache()
     def get_travis_status(self, branch):
         try:
             r = self.travis.get_last_build(self.full_name, branch=branch)
@@ -88,6 +93,7 @@ class Recipe(object):
         except Exception as e:
             return None, None
 
+    @functools.lru_cache()
     def get_appveyor_status(self, branch):
         try:
             r = self.appveyor.get_last_build(repo=self.id, branch=branch)
@@ -95,6 +101,7 @@ class Recipe(object):
         except Exception as e:
             return None, None
 
+    @functools.lru_cache()
     def get_bintray_repo(self):
         try:
             _, id = self.id.split('-')
@@ -102,6 +109,7 @@ class Recipe(object):
         except:
             return None
 
+    @functools.lru_cache()
     def get_bintray_package(self, branch):
         try:
             if self.is_release_branch(branch):

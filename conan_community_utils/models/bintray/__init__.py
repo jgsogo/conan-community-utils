@@ -32,6 +32,8 @@ class Bintray(object):
         pck_name = ':'.join([name, user])
         url = f"{BINTRAY_API_URL}/packages/conan-community/conan/{quote(pck_name, safe='')}"
         r = requests.get(url, auth=self._auth, verify=True)
+        if r.status_code != 200:
+            raise RuntimeError(f"Repository {pck_name} not found (url: {url}): {r.content}")
         r = r.json()
         return r
 

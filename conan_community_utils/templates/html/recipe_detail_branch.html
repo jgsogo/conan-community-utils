@@ -105,4 +105,17 @@
             </div>
         {% endif %}
     {% endif %}
+
+
+    <h4>Summary of errors for branch {{ recipe.active_branch }}</h4>
+    <table class="table">
+        {% for level, branch, msg in recipe._grab_warnings(branch=recipe.active_branch) %}
+            <tr>
+                <td>{{ level }}</td>
+                <td>{{ branch }}</td>
+                <td>{{ msg }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
 {% endblock %}

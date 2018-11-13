@@ -125,3 +125,34 @@ body {
 .dot.dot-error {
     background-color: #ff0000;
 }
+
+.numberCircle {
+    display:inline-block;
+    line-height:0px;
+
+    border-radius:50%;
+    border:0px solid;
+
+    font-size:10px;
+
+}
+
+.numberCircle span {
+    display:inline-block;
+
+    padding-top:50%;
+    padding-bottom:50%;
+
+    margin-left:4px;
+    margin-right:4px;
+}
+
+.numberCircle.numberCircle-warning {
+    background-color: #ffaaba;
+    color: #000000;
+}
+
+.numberCircle.numberCircle-error {
+    background-color: #ff0000;
+    color: #ffffff;
+}

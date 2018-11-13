@@ -16,6 +16,7 @@
     {% set status, url = recipe.get_appveyor_status(branch=recipe.active_branch) %}
     <p>Appveyor: <a href="{{ url }}"><img alt="{{ status }}" src="https://ci.appveyor.com/api/projects/status/github/{{ recipe.full_name }}?branch={{ recipe.active_branch }}&svg=true"/></a></p>
 
+
     <h4>Metadata</h4>
     {% set conanfile = recipe.get_conanfile(branch=recipe.active_branch) %}
     {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
@@ -87,6 +88,21 @@
             </tbody>
         </table>
     {% else %}
-        <p>Error retrieving 'conanfile.py', bintray package or bintray repo.</p>
+        {% if recipe.is_release_branch(branch_name=recipe.active_branch) %}
+            <div class="alert alert-error alert-dismissible fade show" role="alert">
+              <strong>ERROR:</strong> Error retrieving 'conanfile.py', bintray package or bintray repo.
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+        {% else %}
+            <p>It is not a released branch, it doesn't need to be in Bintray.</p>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>TODO:</strong> We can compare against bintray basic information
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}

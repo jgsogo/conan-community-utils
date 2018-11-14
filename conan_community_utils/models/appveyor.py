@@ -1,5 +1,5 @@
-import os
 
+import os
 import dateutil.parser
 import requests
 
@@ -45,7 +45,6 @@ class Appveyor(object):
 
 
 if __name__ == '__main__':
-    import os
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)

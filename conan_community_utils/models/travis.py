@@ -1,10 +1,11 @@
-import logging
-from urllib.parse import urlencode
 
 import dateutil.parser
 import requests
+from urllib.parse import urlencode
 
+import logging
 log = logging.getLogger(__name__)
+
 TRAVIS_URL = 'https://api.travis-ci.org'
 
 

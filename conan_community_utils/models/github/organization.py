@@ -1,11 +1,9 @@
 
-import functools
 from github.Organization import Organization as github_Organization
 
-from conan_community_utils.utils.lazy_property import lazy_property
-from .recipe import Recipe
-import logging
+from conan_community_utils.models.github.recipe import Recipe
 
+import logging
 log = logging.getLogger(__name__)
 
 
@@ -24,6 +22,7 @@ class Organization(object):
         return self._github_org.name
 
     def get_recipes(self):
+        # TODO: memoize with functools.lru_cache
         if not hasattr(self, '_get_recipes'):
             ret = []
             for repo in self._github_org.get_repos('all'):

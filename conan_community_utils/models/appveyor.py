@@ -1,8 +1,7 @@
-
 import os
-import requests
+
 import dateutil.parser
-from urllib.parse import quote
+import requests
 
 import logging
 log = logging.getLogger(__name__)
@@ -61,5 +60,3 @@ if __name__ == '__main__':
     for branch in branches:
         r = t.get_last_build(account=account, repo=repo, branch=branch)
         print(f" - {branch}: {r['status']}")
-
-

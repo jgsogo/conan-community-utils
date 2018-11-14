@@ -1,8 +1,4 @@
-
-import os
 import requests
-from urllib.parse import quote
-
 
 BINTRAY_API_URL = 'https://bintray.com/api/v1'
 
@@ -51,6 +47,7 @@ class Bintray(object):
 
 
 if __name__ == '__main__':
+    import os
     from pprint import pprint
 
     user = 'jgsogo'

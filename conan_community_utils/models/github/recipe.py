@@ -111,18 +111,15 @@ class Recipe(object):
         try:
             _, id = self.id.split('-')
             return self.bintray.get_repository(name=id, user='conan')
-        except:
+        except Exception:
             return None
 
     @functools.lru_cache()
     def get_bintray_package(self, branch):
         try:
-            if self.is_release_branch(branch):
-                _, version = branch.split('/')
-                _, id = self.id.split('-')
-                return self.bintray.get_package(name=id, version=version, user='conan', channel='stable')
-            else:
-                return None
+            _, version = branch.split('/')
+            _, id = self.id.split('-')
+            return self.bintray.get_package(name=id, version=version, user='conan', channel='stable')
         except Exception:
             return None
 

@@ -1,8 +1,7 @@
 
-import os
-import requests
 import dateutil.parser
-from urllib.parse import quote, urlencode
+import requests
+from urllib.parse import urlencode
 
 import logging
 log = logging.getLogger(__name__)
@@ -59,7 +58,7 @@ if __name__ == '__main__':
         print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
 
     import os
-    from pprint import pprint
+
     TRAVIS_TOKEN = os.getenv("TRAVIS_TOKEN")
 
     logging.basicConfig(level=logging.DEBUG)

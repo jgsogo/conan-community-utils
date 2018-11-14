@@ -78,9 +78,9 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                                   _row('Issues', not self._repo.has_issues, 'warning', msg_fail='Remove issues tab from Github'),
                                   _row('Projects', not self._repo.has_projects, 'warning', msg_fail='Remove projects tab from Github'),
                                   _row('Wiki', not self._repo.has_wiki, 'warning', msg_fail='Remove wiki tab from Github'),
-                                  _row('Topics', not self.get_topics(), 'warning', msg_fail='Add topics to Github repository'),
-                                  _row('Homepage', not self._repo.homepage, 'warning', msg_fail='Add homepage to underlying library'),
-                                  _row('Description', not self._repo.description, 'warning', msg_fail='Add description to repository'),
+                                  _row('Topics', self.get_topics(), 'warning', msg_fail='Add topics to Github repository'),
+                                  _row('Homepage', self._repo.homepage, 'warning', msg_fail='Add homepage to underlying library'),
+                                  _row('Description', self._repo.description, 'warning', msg_fail='Add description to repository'),
                               ]}
             ret['Github project configuration'] = github_project
 

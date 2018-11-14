@@ -1,14 +1,10 @@
 
 import os
 import functools
-from functools import partial, partialmethod
 from slugify import slugify
-from urllib.parse import quote
 from collections import defaultdict
 
 from conan_community_utils.models import github
-#from conan_community_utils.models import travis
-#from conan_community_utils.models import appveyor
 from conan_community_utils.views.html._html_mixin import HTMLMixin
 from conan_community_utils.templates import render_check
 

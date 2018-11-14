@@ -50,10 +50,6 @@ class Recipe(object):
     def full_name(self):
         return self._repo.full_name
 
-    #@property
-    #def github_url(self):
-    #    return self._repo.html_url  # TODO: git_url
-
     @functools.lru_cache()
     def get_branches(self):
         return [branch.name for branch in self._repo.get_branches()]

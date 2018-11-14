@@ -24,10 +24,6 @@ class RecipeHTML(HTMLMixin, github.Recipe):
         self._organization = organization
         self.active_branch = None
 
-    @property
-    def url(self):
-        return self.get_url(branch=None)
-
     def get_url(self, branch=None):
         return os.path.join(self._base_url, self.get_detail_url(branch=branch))
 

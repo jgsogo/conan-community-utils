@@ -53,9 +53,9 @@ if __name__ == '__main__':
         g = Github(os.getenv("GITHUB_TOKEN"))
 
         print("Rate limits")
-        print("Calls: {}".format(g.rate_limiting))
+        print(f"Calls: {g.rate_limiting}")
         from datetime import datetime
-        print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+        print(f"Reset rate: {datetime.fromtimestamp(g.rate_limiting_resettime)}")
 
     import os
 

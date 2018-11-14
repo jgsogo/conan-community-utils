@@ -1,6 +1,7 @@
 
 import dateutil.parser
 import requests
+import yaml
 from urllib.parse import urlencode
 
 import logging
@@ -46,6 +47,31 @@ class Travis(object):
         pprint(r.json())
 
 
+def parse_travis_yml(travis_file):
+    log.debug(f"parse_travis_yml(travis_file='{travis_file}')")
+    with open(travis_file, 'r') as f:
+        data = yaml.load(f.read())
+
+        env_global = data['env']['global']
+        if isinstance(env_global, list):
+            joined_env_global = {}
+            for it in env_global:
+                joined_env_global.update(it)
+            env_global = joined_env_global
+
+        jobs = data['jobs']['include']  # TODO: Could be matrix/include
+        for j in jobs:
+            if 'script' in j:
+                continue
+
+            job_env = env_global.copy()
+            for it in j['env'].split(' '):
+                k, v = it.split('=')
+                job_env[k] = v
+            #print(job_env)
+            print(job_env["os"])
+
+
 if __name__ == '__main__':
     def rate_limits():
         from github import Github
@@ -64,6 +90,10 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
+
+    yaml_file = r"/Users/jgsogo/dev/conan-packages/tgbot-cpp/.travis.yml"
+    r = parse_travis_yml(yaml_file)
+    exit(0)
 
     repo = 'conan-community/conan-zlib'
     branches = ['release/1.2.11', 'testing/1.2.11', 'release/1.2.8']

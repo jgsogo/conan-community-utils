@@ -140,11 +140,11 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                 __count_warnings_errors('error')
 
             if self.is_release_branch(branch_name=branch) and not bintray_pck:
-                rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch}"])
+                rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch} (and it is a release branch)!"])
                 __count_warnings_errors('error')
 
             if rows:
-                ret['Meta'] = {'headers': None, 'rows': rows}
+                ret['Errors'] = {'headers': None, 'rows': rows}
 
             if conanfile and bintray_pck:
                 def _row(field, lhs, rhs, if_fail='error', msg_ok='ok', msg_fail='fail'):
@@ -154,7 +154,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                     __count_warnings_errors(str_triage)
                     return field, render_check(str_triage, str_msg), lhs, rhs
 
-                bintray_conanfile = {'headers': ['', '', 'Bintray', f'conanfile @ {branch}'],
+                bintray_conanfile = {'headers': ['', '', f'conanfile @ {branch}', 'Bintray'],
                                      'rows': [
                                          _row('Name', conanfile._attribs['name'], bintray_pck.name, 'error'),
                                          _row('Version', conanfile._attribs['version'], bintray_pck.version, 'error'),
@@ -165,7 +165,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                                          _row('Description', conanfile._attribs.get('description', None), bintray_pck._json['desc'], 'error'),
 
                                      ]}
-                ret['Metadata'] = bintray_conanfile
+                ret['conanfile.py -vs- Bintray'] = bintray_conanfile
             return ret, n_warnings, n_errors
 
     @functools.lru_cache()

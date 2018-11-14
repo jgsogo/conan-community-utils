@@ -6,19 +6,10 @@ import datetime
 from pprint import pformat
 from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
-from functools import partial
 
 
 env = Environment(loader=PackageLoader('conan_community_utils', 'templates'),
                   autoescape=select_autoescape(['html', 'xml']))
-
-
-def html_warning(msg):
-    return Markup(f'<span class="dot dot-warning" title="{msg}"></span>')
-
-
-def html_error(msg):
-    return Markup(f'<span class="dot dot-error" title="{msg}"></span>')
 
 
 def render_check(status, msg, number=' '):

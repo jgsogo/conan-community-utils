@@ -17,105 +17,31 @@
     <p>Appveyor: <a href="{{ url }}"><img alt="{{ status }}" src="https://ci.appveyor.com/api/projects/status/github/{{ recipe.full_name }}?branch={{ recipe.active_branch }}&svg=true"/></a></p>
 
 
-    <h4>Metadata</h4>
-    {% set conanfile = recipe.get_conanfile(branch=recipe.active_branch) %}
-    {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
-    {% set bintray_repo=recipe.get_bintray_repo() %}
-    {% if conanfile and bintray_pck and bintray_repo %}
+    {% set tables, _, _ = recipe._grab_warnings(branch=recipe.active_branch) %}
+    {% for section, table in tables.items() %}
+        <h4>{{ section }}</h4>
         <table class="table">
-            <thead>
-                <tr><th scope="col"></th>
-                    <th scope="col">Bintray</th>
-                    <th scope="col">conanfile.py @ {{ recipe.active_branch }}</th></tr>
-            </thead>
-            <tbody>
+            {% if table['headers'] %}
+                <thead>
+                    <tr>
+                        {% for title in table['headers'] %}
+                            <th scope="col">{{ title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+            {% endif %}
+            {% for row in table['rows'] %}
                 <tr>
-                    <th scope="row" class="text-nowrap">
-                        name
-                        {{ error_eq(bintray_pck.name, conanfile._attribs.name) }}
-                    </th>
-                    <td>{{ bintray_pck.name }}</td>
-                    <td>{{ conanfile._attribs.name }}</td>
+                    {% for item in row %}
+                        {% if loop.first %}
+                            <th scope="row" class="text-nowrap">{{ item }}</th>
+                        {% else %}
+                            <td>{{ item }}</td>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        version
-                        {{ error_eq(bintray_pck.version, conanfile._attribs.version) }}
-                    </th>
-                    <td>{{ bintray_pck.version }}</td>
-                    <td>{{ conanfile._attribs.version }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        url
-                        {{ error_eq(bintray_pck.vcs_url, conanfile._attribs.url) }}
-                    </th>
-                    <td>{{ bintray_repo.vcs_url }}</td>
-                    <td>{{ conanfile._attribs.url }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        homepage
-                        {{ error_eq(bintray_repo.website_url, conanfile._attribs.homepage) }}
-                    </th>
-                    <td>{{ bintray_repo.website_url }}</td>
-                    <td>{{ conanfile._attribs.homepage }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        topics
-                        {{ error_eq(bintray_repo.labels, conanfile._attribs.topics) }}
-                    </th>
-                    <td>{{ bintray_repo.labels }}</td>
-                    <td>{{ conanfile._attribs.topics }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        license
-                        {{ error_eq(bintray_repo.licenses, conanfile._attribs.license) }}
-                    </th>
-                    <td>{{ bintray_repo.licenses }}</td>
-                    <td>{{ conanfile._attribs.license }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        description
-                        {{ warning_eq(bintray_repo.desc, conanfile._attribs.description) }}
-                    </th>
-                    <td>{{ bintray_repo.desc }}</td>
-                    <td>{{ conanfile._attribs.description }}</td>
-                </tr>
-            </tbody>
+            {% endfor %}
         </table>
-    {% else %}
-        {% if recipe.is_release_branch(branch_name=recipe.active_branch) %}
-            <div class="alert alert-error alert-dismissible fade show" role="alert">
-              <strong>ERROR:</strong> Error retrieving 'conanfile.py', bintray package or bintray repo.
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-        {% else %}
-            <p>It is not a released branch, it doesn't need to be in Bintray.</p>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong>TODO:</strong> We can compare against bintray basic information
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-        {% endif %}
-    {% endif %}
-
-
-    <h4>Summary of errors for branch {{ recipe.active_branch }}</h4>
-    <table class="table">
-        {% for level, branch, msg in recipe._grab_warnings(branch=recipe.active_branch) %}
-            <tr>
-                <td>{{ level }}</td>
-                <td>{{ branch }}</td>
-                <td>{{ msg }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+    {% endfor %}
 
 {% endblock %}

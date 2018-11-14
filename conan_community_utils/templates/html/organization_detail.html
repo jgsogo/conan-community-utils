@@ -18,9 +18,9 @@
                 <span data-feather="file-text"></span>
                 {{ recipe }}
                 {% set n_errors = recipe.count_errors() %}
-                {% if n_errors %}<span class="numberCircle numberCircle-error"><span>{{ n_errors }}</span></span>{% endif %}
+                {% if n_errors %}{{ render_check('error', '', n_errors) }}{% endif %}
                 {% set n_warnings = recipe.count_warnings() %}
-                {% if n_warnings %}<span class="numberCircle numberCircle-warning"><span>{{ n_warnings }}</span></span>{% endif %}
+                {% if n_warnings %}{{ render_check('warning', '', n_warnings) }}{% endif %}
               </a>
             </li>
         {% endfor %}

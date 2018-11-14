@@ -26,9 +26,9 @@
             <a class="dropdown-item" href="{{ recipe.get_url(branch=branch) }}">
                 {{ branch }}
                 {% set n_errors = recipe.count_errors(branch=branch) %}
-                {% if n_errors %}<span class="numberCircle numberCircle-error"><span>{{ n_errors }}</span></span>{% endif %}
+                {% if n_errors %}{{ render_check('error', '', n_errors) }}{% endif %}
                 {% set n_warnings = recipe.count_warnings(branch=branch) %}
-                {% if n_warnings %}<span class="numberCircle numberCircle-warning"><span>{{ n_warnings }}</span></span>{% endif %}
+                {% if n_warnings %}{{ render_check('warning', '', n_warnings) }}{% endif %}
             </a>
         {% endfor %}
     </div>
@@ -36,88 +36,31 @@
 {% endblock %}
 
 {% block content_detail %}
-    <h4>Github project configuration:</h4>
-    <table class="table">
-        <tbody>
-            <tr>
-                <td>Issues {{ error_false(recipe._repo.has_issues, "No issues in project repositories") }}</td>
-                <td>{{ recipe._repo.has_issues }}</td>
-            </tr>
-            <tr>
-                <td>Projects {{ warning_false(recipe._repo.has_projects, "No projects in repositories") }}</td>
-                <td>{{ recipe._repo.has_projects }}</td>
-            </tr>
-            <tr>
-                <td>Wiki {{ warning_false(recipe._repo.has_wiki, "No wiki in repositories") }}</td>
-                <td>{{ recipe._repo.has_wiki }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h4>Github project -vs- Bintray</h4>
-    {% set bintray_repo=recipe.get_bintray_repo() %}
-    {% if bintray_repo %}
+    {% set tables, _, _ = recipe._grab_warnings(branch=False) %}
+    {% for section, table in tables.items() %}
+        <h4>{{ section }}</h4>
         <table class="table">
-            <thead>
+            {% if table['headers'] %}
+                <thead>
+                    <tr>
+                        {% for title in table['headers'] %}
+                            <th scope="col">{{ title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+            {% endif %}
+            {% for row in table['rows'] %}
                 <tr>
-                    <th scope="col"></th>
-                    <th scope="col">Github</th>
-                    <th scope="col">Bintray</th>
+                    {% for item in row %}
+                        {% if loop.first %}
+                            <th scope="row" class="text-nowrap">{{ item }}</th>
+                        {% else %}
+                            <td>{{ item }}</td>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">name</th>
-                    <td>{{ recipe._repo.name }}</td>
-                    <td>{{ bintray_repo.name }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        description
-                        {{ error_eq(recipe._repo.description, bintray_repo.desc) }}
-                    </th>
-                    <td>{{ recipe._repo.description }}</td>
-                    <td>{{ bintray_repo.desc }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        homepage
-                        {{ error_eq(recipe._repo.homepage, bintray_repo.website_url) }}
-                    </th>
-                    <td>{{ recipe._repo.homepage }}</td>
-                    <td>{{ bintray_repo.website_url }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        topics
-                        {{ error_eq(recipe.get_topics(), bintray_repo.labels) }}
-                    </th>
-                    <td>{{ recipe.get_topics() }}</td>
-                    <td>{{ bintray_repo.labels }}</td>
-                </tr>
-                <tr>
-                    <th scope="row" class="text-nowrap">
-                        license
-                        {{ error_eq(recipe.get_license(), bintray_repo.licenses) }}
-                    </th>
-                    <td>{{ recipe.get_license() }}</td>
-                    <td>{{ bintray_repo.licenses }}</td>
-                </tr>
-            </tbody>
+            {% endfor %}
         </table>
-    {% else %}
-        <p>Error retrieving bintray_repo.</p>
-    {% endif %}
-
-    <h4>Summary of errors</h4>
-    <table class="table">
-    {% for level, branch, msg in recipe._grab_warnings(branch=None) %}
-        <tr>
-            <td>{{ level }}</td>
-            <td>{{ branch }}</td>
-            <td>{{ msg }}</td>
-        </tr>
     {% endfor %}
-    </table>
 {% endblock %}
 

@@ -134,17 +134,17 @@ class RecipeHTML(HTMLMixin, github.Recipe):
             conanfile = self.get_conanfile(branch=branch)
             bintray_pck = self.get_bintray_package(branch=branch)
 
-            if self.is_release_branch(branch_name=branch):
-                rows = []
-                if not conanfile:
-                    rows.append([render_check('error', 'error'), f"Branch {branch} doesn't have a conanfile!"])
-                    __count_warnings_errors('error')
-                if not bintray_pck:
-                    __count_warnings_errors('error')
-                    rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch}"])
+            rows = []
+            if not conanfile:
+                rows.append([render_check('error', 'error'), f"Branch {branch} doesn't have a conanfile!"])
+                __count_warnings_errors('error')
 
-                if rows:
-                    ret['Meta'] = {'headers': None, 'rows': rows}
+            if self.is_release_branch(branch_name=branch) and not bintray_pck:
+                rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch}"])
+                __count_warnings_errors('error')
+
+            if rows:
+                ret['Meta'] = {'headers': None, 'rows': rows}
 
             if conanfile and bintray_pck:
                 def _row(field, lhs, rhs, if_fail='error', msg_ok='ok', msg_fail='fail'):

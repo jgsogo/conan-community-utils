@@ -5,15 +5,12 @@ from datetime import datetime, timedelta
 
 from github import Github
 
-from conan_community_utils.models.github.organization import Organization
 from conan_community_utils import templates
 
 from .organization import OrganizationHTML
 
 import logging
 log = logging.getLogger(__name__)
-
-me = os.path.dirname(__file__)
 
 
 def rate_limits(g, raise_at=500):
@@ -86,6 +83,8 @@ if __name__ == '__main__':
     name = 'conan-community'
     base_url = args.base_url
     target_branch = 'master'
+
+    me = os.path.dirname(__file__)
     output_folder = os.path.join(me, '..', '..', '..', '..', 'tmp')
     #base_url = output_folder + "/"
     force = True

@@ -43,7 +43,3 @@ class HTMLMixin(object):
                          output_file=output_filename)
         log.debug(f"> Generated '{output_filename}'")
         return output_filename
-
-    def dump(self):
-        from pprint import pformat
-        return pformat(vars(self))

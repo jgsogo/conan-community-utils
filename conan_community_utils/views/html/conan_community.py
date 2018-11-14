@@ -2,12 +2,10 @@
 import os
 import shutil
 from datetime import datetime, timedelta
-
 from github import Github
 
 from conan_community_utils import templates
-
-from .organization import OrganizationHTML
+from conan_community_utils.views.html.organization import OrganizationHTML
 
 import logging
 log = logging.getLogger(__name__)

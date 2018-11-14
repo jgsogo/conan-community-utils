@@ -1,12 +1,10 @@
-
-import os
-import requests
-import dateutil.parser
-from urllib.parse import quote, urlencode
-
 import logging
-log = logging.getLogger(__name__)
+from urllib.parse import urlencode
 
+import dateutil.parser
+import requests
+
+log = logging.getLogger(__name__)
 TRAVIS_URL = 'https://api.travis-ci.org'
 
 
@@ -59,7 +57,7 @@ if __name__ == '__main__':
         print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
 
     import os
-    from pprint import pprint
+
     TRAVIS_TOKEN = os.getenv("TRAVIS_TOKEN")
 
     logging.basicConfig(level=logging.DEBUG)

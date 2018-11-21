@@ -1,5 +1,6 @@
 
 import requests
+from urllib.parse import quote
 
 BINTRAY_API_URL = 'https://bintray.com/api/v1'
 

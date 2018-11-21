@@ -2,6 +2,7 @@
 import os
 import dateutil.parser
 import requests
+from urllib.parse import quote
 
 import logging
 log = logging.getLogger(__name__)

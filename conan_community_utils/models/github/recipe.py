@@ -126,11 +126,11 @@ if __name__ == "__main__":
     g = Github(os.getenv("GITHUB_TOKEN"))
 
     print("Rate limits")
-    print("Calls: {}".format(g.rate_limiting))
+    print(f"Calls: {g.rate_limiting}")
     from datetime import datetime
-    print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+    print(f"Reset rate: {datetime.fromtimestamp(g.rate_limiting_resettime)}")
 
-    print("Authorized in Github for user '{}'".format(g.get_user().name))
+    print(f"Authorized in Github for user '{g.get_user().name}'")
 
     org = g.get_organization("conan-community").get_repos('all')
     recipes = []
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         print(recipe)
         print(recipe._repo.html_url)
         for branch in recipe.get_branches():
-            print(" - {} is release {}".format(branch, Recipe.is_release_branch(branch)))
+            print(f" - {branch} is release {Recipe.is_release_branch(branch)}")
             if Recipe.is_release_branch(branch):
                 conanfile = recipe.get_conanfile(branch=branch)
                 print(conanfile._attribs["version"])
@@ -155,6 +155,6 @@ if __name__ == "__main__":
                 print(recipe.get_appveyor_status(branch=branch))
 
     print("Rate limits")
-    print("Calls: {}".format(g.rate_limiting))
+    print(f"Calls: {g.rate_limiting}")
     from datetime import datetime
-    print("Reset rate: {}".format(datetime.fromtimestamp(g.rate_limiting_resettime)))
+    print(f"Reset rate: {datetime.fromtimestamp(g.rate_limiting_resettime)}")

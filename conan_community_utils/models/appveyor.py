@@ -1,8 +1,7 @@
 
 import os
-import requests
 import dateutil.parser
-from urllib.parse import quote
+import requests
 
 import logging
 log = logging.getLogger(__name__)
@@ -46,7 +45,6 @@ class Appveyor(object):
 
 
 if __name__ == '__main__':
-    import os
     logging.basicConfig(level=logging.DEBUG)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
@@ -61,5 +59,3 @@ if __name__ == '__main__':
     for branch in branches:
         r = t.get_last_build(account=account, repo=repo, branch=branch)
         print(f" - {branch}: {r['status']}")
-
-

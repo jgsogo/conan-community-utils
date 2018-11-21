@@ -29,6 +29,6 @@ class Organization(object):
                 if Recipe.is_recipe(repo.name):
                     ret.append(self.RecipeClass(repo=repo))
                 else:
-                    log.debug("Repository '{}/{}' discarded as recipe".format(self, repo.name))
+                    log.debug(f"Repository '{self}/{repo.name}' discarded as recipe")
             setattr(self, '_get_recipes', ret)
         return getattr(self, '_get_recipes')

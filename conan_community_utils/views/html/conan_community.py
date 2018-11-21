@@ -24,17 +24,17 @@ def generate_html(name, output_folder, base_url, force=False):
     # Get access to Github (do not delete things before checking credentials)
     gh = Github(os.getenv("GITHUB_TOKEN"))
     rate_limits(gh, raise_at=100)
-    log.debug("Authenticated in Github as user '{}".format(gh.get_user().name))
+    log.debug(f"Authenticated in Github as user '{gh.get_user().name}")
 
     # Work on output folder
     output_folder = os.path.abspath(output_folder)
-    log.info("Generate HTML for community '{}' in '{}'".format(name, output_folder))
+    log.info(f"Generate HTML for community '{name}' in '{output_folder}'")
 
     if os.path.exists(output_folder):
         if not force:
-            raise RuntimeError("Output folder '{}' already exists. Delete it or use 'force'")
+            raise RuntimeError(f"Output folder '{output_folder}' already exists. Delete it or use 'force'")
         else:
-            log.warning("Delete output folder '{}'".format(output_folder))
+            log.warning(f"Delete output folder '{output_folder}'")
             shutil.rmtree(output_folder, ignore_errors=True)
     os.makedirs(output_folder, exist_ok=False)
 
@@ -50,7 +50,7 @@ def generate_html(name, output_folder, base_url, force=False):
     for recipe in all_recipes:
         try:
             rate_limits(gh, raise_at=500)
-            log.info("Rendering recipe '{}'".format(recipe))
+            log.info(f"Rendering recipe '{recipe}'")
             recipe.render(output_folder=output_folder, all_recipes=all_recipes)
         except Exception as e:
             msg = f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}"
@@ -60,7 +60,7 @@ def generate_html(name, output_folder, base_url, force=False):
             traceback.print_exc()
 
     index = org.render(output_folder=output_folder, errors=errors, all_recipes=all_recipes)
-    log.info("HTML index: {}".format(index))
+    log.info(f"HTML index: {index}")
 
     return index
 

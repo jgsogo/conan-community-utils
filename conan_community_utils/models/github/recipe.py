@@ -62,21 +62,21 @@ class Recipe(object):
     def get_conanfile(self, branch):
         try:
             content = self._repo.get_contents("conanfile.py", ref=branch).decoded_content.decode("utf-8")
-            conanfile = ConanFile(content=content)
-            return conanfile
         except Exception as e:
             log.error(f"Cannot retrieve 'conanfile.py' (repo {self.full_name}) from branch {branch}: ({type(e)}) {e}")
             return None
+        else:
+            return ConanFile(content=content)
 
     @functools.lru_cache()
     def get_readme(self, branch):
         try:
             content = self._repo.get_contents("README.md", ref=branch).decoded_content.decode("utf-8")
-            readme = Readme(content=content)
-            return readme
         except Exception as e:
             log.error(f"Cannot retrieve 'README.md' (repo {self.full_name}) from branch {branch}: ({type(e)}) {e}")
             return None
+        else:
+            return Readme(content=content)
 
     @functools.lru_cache()
     def get_license(self):

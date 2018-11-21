@@ -2,7 +2,7 @@
 import dateutil.parser
 import requests
 import yaml
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 import logging
 log = logging.getLogger(__name__)

@@ -7,6 +7,7 @@ from github.Repository import Repository
 from .files import ConanFile, Readme, TravisYML, AppveyorYML, BuildPy
 from conan_community_utils.ci.travis import Travis
 from conan_community_utils.ci.appveyor import Appveyor
+from conan_community_utils.storages.bintray.api import Bintray
 
 """
 from conan_community_utils.models.travis import Travis
@@ -23,7 +24,7 @@ class Recipe(object):
 
     travis = Travis(token=os.getenv("TRAVIS_TOKEN"))
     appveyor = Appveyor(token=os.getenv("APPVEYOR_TOKEN"), account=os.getenv("APPVEYOR_ACCOUNT"))
-    # bintray = Bintray(api_token=os.getenv("BINTRAY_TOKEN"), api_username=os.getenv("BINTRAY_USERNAME"))
+    bintray = Bintray(api_token=os.getenv("BINTRAY_TOKEN"), api_username=os.getenv("BINTRAY_USER"))
 
     def __init__(self, repo):
         assert isinstance(repo, Repository)
@@ -56,7 +57,7 @@ class Recipe(object):
     # At repo level
     @functools.lru_cache()
     def get_topics(self):
-        return self._repo.get_topics()
+        return sorted(self._repo.get_topics())
 
     @functools.lru_cache()
     def get_license(self):
@@ -130,24 +131,20 @@ class Recipe(object):
                           f"for branch '{branch}: ({type(e)}) {e}'")
             return None
 
-    """
+    # Related to BINTRAY
     @functools.lru_cache()
     def get_bintray_repo(self):
         try:
-            _, id = self.id.split('-')
-            return self.bintray.get_repository(name=id, user='conan')
+            return self.bintray.get_package(repo_name=self.full_name, user='conan')
         except Exception:
             return None
 
     @functools.lru_cache()
     def get_bintray_package(self, branch):
         try:
-            _, version = branch.split('/')
-            _, id = self.id.split('-')
-            return self.bintray.get_package(name=id, version=version, user='conan', channel='stable')
+            return self.bintray.get_package_version(repo_name=self.full_name, user='conan', branch=branch)
         except Exception:
             return None
-    """
 
 
 if __name__ == "__main__":
@@ -167,7 +164,7 @@ if __name__ == "__main__":
     branches = args.branch or ['release/1.2.11', 'testing/1.2.11', 'release/1.2.8']
     log_level = max(3 - args.verbose_count, 0) * 10
 
-    # Configure login
+    # Configure logging
     logging.basicConfig(level=log_level)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
@@ -182,6 +179,7 @@ if __name__ == "__main__":
     print(f" - description: {r.description}")
     print(f" - homepage: {r.homepage}")
     print(f" - topics: {r.get_topics()}")
+    print(f" - bintray: {r.get_bintray_repo()}")
 
     for br in branches:
         print(f" - branch: {br}")
@@ -193,3 +191,4 @@ if __name__ == "__main__":
         print(f"\tbuild.py: {r.get_buildpy_file(branch=br).name}")
         print(f"\ttravis_status: {r.get_travis_status(branch=br)}")
         print(f"\tappveyor_status: {r.get_appveyor_status(branch=br)}")
+        print(f"\tbintray_pck: {r.get_bintray_package(branch=br).url}")

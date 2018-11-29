@@ -35,7 +35,6 @@ class Organization(object):
 if __name__ == "__main__":
     import os
     import argparse
-    from conan_community_utils.github.api import api_object as g
 
     parser = argparse.ArgumentParser(description='Run github/organization example')
     parser.add_argument('--organization', help='Organization name')
@@ -47,7 +46,7 @@ if __name__ == "__main__":
     organization = args.organization or 'conan-community'
     log_level = max(3 - args.verbose_count, 0) * 10
 
-    # Configure login
+    # Configure logging
     logging.basicConfig(level=log_level)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)

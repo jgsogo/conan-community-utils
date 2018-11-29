@@ -13,9 +13,9 @@ TRAVIS_URL = 'https://api.travis-ci.org'
 class Travis(object):
     """ Access travis using v3 """
 
-    def __init__(self, token, travis_url=TRAVIS_URL):
+    def __init__(self, token):
         self._token = token
-        self._travis_url = travis_url
+        self._travis_url = TRAVIS_URL
 
     def headers(self):
         return {'Travis-API-Version': '3',

@@ -26,6 +26,7 @@ class CIBase(object):
         self._token = token
 
     def get_last_build(self, repo, branch, *args, **kwargs):
+        """ Return a LastBuildInfo object """
         # TODO: Add checks related to repo and branch
         r = self._get_last_build(repo, branch, *args, **kwargs)
         assert isinstance(r, LastBuildInfo)
@@ -35,4 +36,6 @@ class CIBase(object):
         raise NotImplementedError
 
     def get_settings(self, repo):
+        """ Returns a list of environment varibles where each item is a tuple with the
+         following information: (name, value, is_public)"""
         raise NotImplementedError

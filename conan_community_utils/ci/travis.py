@@ -58,22 +58,52 @@ class Travis(CIBase):
             return ret
 
     def get_settings(self, repo):
-        pass
+        log.debug(f"Travis::get_settings(repo={repo})")
+
+        url = f'{self._url}/repo/{quote(repo, safe="")}/env_vars'
+        r = requests.get(url=url, headers=self.headers())
+        r = r.json()
+        log.debug(f"{pformat(r)}")
+
+        for it in r["env_vars"]:
+            yield it['name'], it.get('value', None), it['public']
+
+    def set_settings(self, values):
+        raise NotImplementedError("Travis::set_settings")
 
 
 if __name__ == '__main__':
     import os
-    TRAVIS_TOKEN = os.getenv("TRAVIS_TOKEN")
+    import argparse
 
-    logging.basicConfig(level=logging.DEBUG)
+    parser = argparse.ArgumentParser(description='Run Travis example')
+    parser.add_argument('--repo', help='Repo name')
+    parser.add_argument('--branch', action='append', help='Branches to work over')
+    parser.add_argument("-v", "--verbose", dest="verbose_count",
+                        action="count", default=0,
+                        help="increases log verbosity for each occurence.")
+    args = parser.parse_args()
+
+    repo = args.repo or 'conan-community/conan-zlib'
+    branches = args.branch or ['release/1.2.11', 'testing/1.2.11', 'release/1.2.8']
+    log_level = max(3 - args.verbose_count, 0) * 10
+
+    # Configure login
+    logging.basicConfig(level=log_level)
     logging.getLogger('urllib3').setLevel(level=logging.ERROR)
     logging.getLogger('github').setLevel(level=logging.ERROR)
 
-    repo = 'conan-community/conan-zlib'
-    branches = ['release/1.2.11', 'testing/1.2.11', 'release/1.2.8']
-
+    TRAVIS_TOKEN = os.getenv("TRAVIS_TOKEN")
     t = Travis(TRAVIS_TOKEN)
+    print(f"Repo '{repo}'")
+
+    print(f" - env vars:")
+    for name, value, public in t.get_settings(repo=repo):
+        print(f"\t{name}: {value} {'' if public else '[private]'}")
+
     for branch in branches:
         r = t.get_last_build(repo=repo, branch=branch)
         print(f' - {branch}: {r}')
-        break
+        print(f'\tstatus: {r.status}')
+        print(f'\tdate: {r.commit["date"]}')
+        print(f'\tmessage: {r.commit["message"].splitlines()[0]}')

@@ -7,6 +7,7 @@ from collections import defaultdict
 from conan_community_tools.github.recipe import Recipe
 from conan_community_tools.views.html._html_mixin import HTMLMixin
 from conan_community_tools.templates import render_check
+from .file_view import FileViewHTML
 
 import logging
 log = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ class RecipeHTML(HTMLMixin, Recipe):
                                   _row('Topics', self.get_topics(), 'warning', msg_fail='Add topics to Github repository'),
                                   _row('Homepage', self._repo.homepage, 'warning', msg_fail='Add homepage to underlying library'),
                                   _row('Description', self._repo.description, 'warning', msg_fail='Add description to repository'),
+                                  _row("Github settings", self.get_github_settings_file(), 'warning', msg_fail='Provide a Github settings file'),
                               ]}
             ret['Github project configuration'] = github_project
 
@@ -185,8 +187,19 @@ class RecipeHTML(HTMLMixin, Recipe):
 
     def render(self, output_folder, **context):
         log.debug(f"Render recipe detail '{self.id}'")
-        html = super().render(output_folder=output_folder, **context)
 
+        # Render pages associated with the `default_branch` or the repo itself
+        github_settings_file = self.get_github_settings_file()
+        if github_settings_file:
+            file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=github_settings_file)
+            github_settings_file = {'title': github_settings_file.name,
+                                    'url': file_tpl.url,
+                                    'file': github_settings_file}
+            file_tpl.render(output_folder=output_folder, github_settings_file=github_settings_file, **context)
+
+        html = super().render(output_folder=output_folder, github_settings_file=github_settings_file, **context)
+
+        # Render pages for each of the branches
         for branch in self.get_branches():
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")

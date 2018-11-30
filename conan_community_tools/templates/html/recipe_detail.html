@@ -35,32 +35,55 @@
 </div>
 {% endblock %}
 
+
 {% block content_detail %}
-    {% set tables, _, _ = recipe._grab_warnings(branch=False) %}
-    {% for section, table in tables.items() %}
-        <h4>{{ section }}</h4>
-        <table class="table">
-            {% if table['headers'] %}
-                <thead>
+
+    {% block content_detail_tab_nav %}
+        {% if github_settings_file %}
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="{{ recipe.get_url(branch=False) }}">Details</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ github_settings_file['url'] }}">{{ github_settings_file['title'] }}</a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+        {% endif %}
+    {% endblock %}
+
+    {% block content_detail_tab_content %}
+        {% set tables, _, _ = recipe._grab_warnings(branch=False) %}
+        {% for section, table in tables.items() %}
+            <h4>{{ section }}</h4>
+            <table class="table">
+                {% if table['headers'] %}
+                    <thead>
+                        <tr>
+                            {% for title in table['headers'] %}
+                                <th scope="col">{{ title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                {% endif %}
+                {% for row in table['rows'] %}
                     <tr>
-                        {% for title in table['headers'] %}
-                            <th scope="col">{{ title }}</th>
+                        {% for item in row %}
+                            {% if loop.first %}
+                                <th scope="row" class="text-nowrap">{{ item }}</th>
+                            {% else %}
+                                <td>{{ item }}</td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
-                </thead>
-            {% endif %}
-            {% for row in table['rows'] %}
-                <tr>
-                    {% for item in row %}
-                        {% if loop.first %}
-                            <th scope="row" class="text-nowrap">{{ item }}</th>
-                        {% else %}
-                            <td>{{ item }}</td>
-                        {% endif %}
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </table>
-    {% endfor %}
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endblock %}
+
+    {% if github_settings_file %}
+        </div>
+    {% endif %}
+
 {% endblock %}
 

@@ -12,7 +12,7 @@ class FileViewHTML(HTMLMixin):
 
     def get_detail_url(self):
         recipe_detail_url = self._parent_recipe.get_detail_url()
-        return recipe_detail_url.replace(".html", "_file.html")
+        return recipe_detail_url.replace(".html", "_{}.html".format(self._obj_file.id))
 
     def get_context(self, **context):
         context = super().get_context(object=self._parent_recipe, **context)

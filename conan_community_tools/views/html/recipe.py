@@ -189,20 +189,39 @@ class RecipeHTML(HTMLMixin, Recipe):
         log.debug(f"Render recipe detail '{self.id}'")
 
         # Render pages associated with the `default_branch` or the repo itself
-        github_settings_file = self.get_github_settings_file()
-        if github_settings_file:
-            file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=github_settings_file)
-            github_settings_file = {'title': github_settings_file.name,
-                                    'url': file_tpl.url,
-                                    'file': github_settings_file}
-            file_tpl.render(output_folder=output_folder, github_settings_file=github_settings_file, **context)
+        files_in_default_branch = [self.get_github_settings_file(),]
+        files_in_default_branch = [x for x in files_in_default_branch if x is not None]
+        data = []
+        for file_in_default_branch in files_in_default_branch:
+            file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=file_in_default_branch)
+            data.append({'title': file_in_default_branch.name, 'url': file_tpl.url, 'file': file_in_default_branch, '_html_obj': file_tpl})
 
-        html = super().render(output_folder=output_folder, github_settings_file=github_settings_file, **context)
+        for tab_file in data:
+            tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data, **context)
+
+        html = super().render(output_folder=output_folder, files_in_tabs=data, **context)
 
         # Render pages for each of the branches
         for branch in self.get_branches():
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
-            super().render(output_folder=output_folder, **context)
+
+            files_in_each_branch = [self.get_appveyor_file(branch=self.active_branch),
+                                    self.get_buildpy_file(branch=self.active_branch),
+                                    self.get_readme_file(branch=self.active_branch),
+                                    self.get_travis_file(branch=self.active_branch)]
+            files_in_each_branch = [x for x in files_in_each_branch if x is not None]
+            data = []
+            for file_in_each_branch in files_in_each_branch:
+                file_tpl = FileViewHTML(base_url=self._base_url, recipe=self,
+                                        obj_file=file_in_each_branch)
+                data.append({'title': file_in_each_branch.name, 'url': file_tpl.url,
+                             'file': file_in_each_branch, '_html_obj': file_tpl})
+
+            for tab_file in data:
+                tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data,
+                                             **context)
+
+            super().render(output_folder=output_folder, files_in_tabs=data, **context)
         self.active_branch = None
         return html

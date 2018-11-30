@@ -39,14 +39,16 @@
 {% block content_detail %}
 
     {% block content_detail_tab_nav %}
-        {% if github_settings_file %}
+        {% if files_in_tabs %}
             <ul class="nav nav-tabs">
               <li class="nav-item">
                 <a class="nav-link active" href="{{ recipe.get_url(branch=False) }}">Details</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{{ github_settings_file['url'] }}">{{ github_settings_file['title'] }}</a>
-              </li>
+                {% for it in files_in_tabs %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ it['url'] }}">{{ it['title'] }}</a>
+                  </li>
+                {% endfor %}
             </ul>
             <div class="tab-content" id="myTabContent">
         {% endif %}
@@ -81,7 +83,7 @@
         {% endfor %}
     {% endblock %}
 
-    {% if github_settings_file %}
+    {% if files_in_tabs %}
         </div>
     {% endif %}
 

@@ -1,4 +1,5 @@
 
+import os
 import difflib
 
 
@@ -8,6 +9,10 @@ class FileView(object):
 
     def __init__(self, content):
         self.content = content
+
+    @property
+    def id(self):
+        return os.path.basename(self.name)
 
     @staticmethod
     def expected(**context):

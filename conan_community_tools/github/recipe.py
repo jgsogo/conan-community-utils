@@ -77,6 +77,7 @@ class Recipe(object):
 
     @functools.lru_cache()
     def get_github_settings_file(self):
+        return SettingsYML(content="<fck settings content>")
         return self._get_file(branch=self.default_branch, FileClass=SettingsYML, filepath='.github')
 
     # Branch level calls

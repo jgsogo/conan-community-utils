@@ -15,6 +15,7 @@ class LastBuildInfo(object):
     status = BuildStatus.UNKNOWN
     url = None
     commit = dict.fromkeys(['date', 'message', 'sha'])
+    image_url = None
 
     def __str__(self):
         msg_title = self.commit['message'].splitlines()[0]

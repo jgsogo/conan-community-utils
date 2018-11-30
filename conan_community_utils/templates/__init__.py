@@ -17,11 +17,13 @@ def render_check(status, msg, number=' '):
     return Markup(f'<span class="numberCircle numberCircle-{status}" title="{msg}"><span>{number}</span></span>')
 
 
-def render(candidates, context, output_file=None):
+def render(candidates, context, output_file=None, add_globals=None):
     template = env.get_template(candidates)
     template.globals['now'] = datetime.datetime.utcnow
     template.globals['render_check'] = render_check
     template.globals['pprint'] = pformat
+    if add_globals:
+        template.globals.update(add_globals)
     output = template.render(**context)
     if output_file:
         os.makedirs(os.path.dirname(output_file), exist_ok=True)

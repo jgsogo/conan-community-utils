@@ -1,0 +1,15 @@
+repository:
+  # name: repo-name
+  description: {{ description }}
+  homepage: {{ homepage }}
+  # default_branch: master
+  topics: {{ topics }}
+
+  private: false
+  has_issues: false
+  has_wiki: false
+  has_downloads: false
+
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false

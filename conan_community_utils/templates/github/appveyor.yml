@@ -11,28 +11,23 @@ environment:
     CONAN_UPLOAD: "{{ conan_upload }}"
     CONAN_STABLE_BRANCH_PATTERN: "(release|stable)/*"
     CONAN_UPLOAD_ONLY_WHEN_STABLE: 1 # Will only upload when the branch matches stable pattern
+    CONAN_TOTAL_PAGES: {{ total_pages|default(1) }}
+{% if build_policy %}    CONAN_BUILD_POLICY: {{ build_policy }}{% endif %}
 
     matrix:
-      {% for compiler in visual_compilers %}
-      {% for page in range(1, total_pages|default(1) + 1) %}
+      {% for compiler in visual_compilers %}{% for page in range(1, total_pages|default(1) + 1) %}
         - APPVEYOR_BUILD_WORKER_IMAGE: {{ compiler.worker_image }}
           CONAN_VISUAL_VERSIONS: {{ compiler.version }}
           CONAN_ARCHS: {{ compiler.arch }}
           CONAN_BUILD_TYPES: {{ compiler.build_type }}
-          CONAN_VISUAL_RUNTIMES: {{ compiler_runtime }}
+          CONAN_VISUAL_RUNTIMES: {{ compiler.runtime }}
           CONAN_CURRENT_PAGE: {{ page }}
-          CONAN_TOTAL_PAGES: {{ total_pages }}
-      {% endfor %}
-      {% endfor %}
-
-      {% for configuration in mingw_configurations %}
-      {% for page in range(1, total_pages|default(1) + 1) %}
+      {% endfor %}{% endfor %}
+      {% for configuration in mingw_configurations %}{% for page in range(1, total_pages|default(1) + 1) %}
         - MINGW_CONFIGURATIONS: "{{ configuration }}"
           CONAN_BASH_PATH: "c:\\msys64\\usr\\bin\\bash"
           CONAN_CURRENT_PAGE: {{ page }}
-          CONAN_TOTAL_PAGES: {{ total_pages }}
-      {% endfor %}
-      {% endfor %}
+      {% endfor %}{% endfor %}
 
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/
@@ -42,4 +37,3 @@ install:
 
 test_script:
   - python build.py
-

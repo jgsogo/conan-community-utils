@@ -50,6 +50,7 @@ class Travis(CIBase):
             ret.commit['sha'] = build["commit"]["sha"]
             ret.commit['message'] = build["commit"]["message"]
             ret.commit['date'] = dateutil.parser.parse(build["commit"]["committed_at"])
+            ret.image_url = f'https://travis-ci.org/{build["repository"]["slug"]}.svg?branch={build["branch"]["name"]}'
 
         except Exception as e:
             log.error(f"Error retrieving information from last build status for repo '{repo}' "

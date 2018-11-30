@@ -46,7 +46,7 @@ class Bintray(object):
         url = f"{BINTRAY_API_URL}/packages/{self.subject}/{self.repo}/{quote(pck_name, safe='')}"
         r = requests.get(url, auth=self._auth, verify=True)
         if r.status_code != 200:
-            log.error(f"Package {pck_name} not found (url: {url}): {r.content}")
+            # log.error(f"Package {pck_name} not found (url: {url}): {r.content}")
             raise RuntimeError(f"Package {pck_name} not found (url: {url}): {r.content}")
         r = r.json()
         log.debug(f" - {r}")
@@ -65,7 +65,7 @@ class Bintray(object):
         url = f"{BINTRAY_API_URL}/packages/{self.subject}/{self.repo}/{quote(pck_name, safe='')}/versions/{quote(version_str, safe='')}"
         r = requests.get(url, auth=self._auth, verify=True)
         if r.status_code != 200:
-            log.error(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
+            # log.error(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
             raise RuntimeError(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
         r = r.json()
         log.debug(f" - {r}")

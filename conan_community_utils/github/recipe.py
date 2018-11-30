@@ -4,7 +4,7 @@ import re
 import functools
 from github.Repository import Repository
 
-from .files import ConanFile, Readme, TravisYML, AppveyorYML, BuildPy
+from .files import ConanFile, Readme, TravisYML, AppveyorYML, BuildPy, SettingsYML
 from conan_community_utils.ci.travis import Travis
 from conan_community_utils.ci.appveyor import Appveyor
 from conan_community_utils.storages.bintray.api import Bintray
@@ -79,6 +79,10 @@ class Recipe(object):
     def description(self):
         return self._repo.description
 
+    @functools.lru_cache()
+    def get_github_settings_file(self):
+        return self._get_file(branch=self.default_branch, FileClass=SettingsYML, filepath='.github')
+
     # Branch level calls
     def _get_file(self, branch, FileClass, filepath=''):
         try:
@@ -133,17 +137,19 @@ class Recipe(object):
 
     # Related to BINTRAY
     @functools.lru_cache()
-    def get_bintray_repo(self):
+    def get_bintray_package(self):
         try:
             return self.bintray.get_package(repo_name=self.full_name, user='conan')
-        except Exception:
+        except Exception as e:
+            log.error(f"Cannot find bintray package: {e}")
             return None
 
     @functools.lru_cache()
-    def get_bintray_package(self, branch):
+    def get_bintray_package_version(self, branch):
         try:
             return self.bintray.get_package_version(repo_name=self.full_name, user='conan', branch=branch)
-        except Exception:
+        except Exception as e:
+            log.error(f"Cannot find bintray package: {e}")
             return None
 
 

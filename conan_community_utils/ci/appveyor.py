@@ -37,10 +37,10 @@ class Appveyor(CIBase):
         if '/' in repo:
             return repo.split("/")[1]
 
-    def _get_last_build(self, repo, branch, *args, **kwargs):
-        log.debug(f"Appveyor::get_last_build(repo={repo}, branch={branch})")
+    def _get_last_build(self, repo_full_name, branch, *args, **kwargs):
+        log.debug(f"Appveyor::get_last_build(repo={repo_full_name}, branch={branch})")
 
-        repo = self._fix_repo_name(repo)
+        repo = self._fix_repo_name(repo_full_name)
         url = f"{self._url}/projects/{quote(self._account, safe='')}/{quote(repo, safe='')}/branch/{quote(branch, safe='')}"
         r = requests.get(url=url, headers=self.headers())
         r = r.json()
@@ -54,6 +54,9 @@ class Appveyor(CIBase):
             ret.commit['sha'] = r["build"]["commitId"]
             ret.commit['message'] = r["build"]["message"] or '<empty>'
             ret.commit['date'] = dateutil.parser.parse(r["build"]["committed"])
+            # ret.image_url = f"https://ci.appveyor.com/api/projects/status/2135ith6nulo4cwn/branch/{r['build']['branch']}?svg=true"  # FIXME: I don't know how to get that token
+            ret.image_url = f"https://ci.appveyor.com/api/projects/status/github/{quote(repo_full_name, safe='')}?branch={r['build']['branch']}&svg=true"
+
         except Exception as e:
             log.error(f"Error retrieving information from last build status for repo '{repo}' "
                       f"(branch='{branch}'): {e}. Returned json was:\n{pformat(r)}")
@@ -70,7 +73,8 @@ class Appveyor(CIBase):
         log.debug(f"{pformat(r)}")
 
         for it in r:
-            yield it['name'], it['value']['value'], bool(not it['value']['isEncrypted'])
+            encrypted = it['value']['isEncrypted']
+            yield it['name'], it['value']['value'] if not encrypted else "<encrypted>", bool(not encrypted)
 
     def set_settings(self, values):
         raise NotImplementedError("Appveyor::set_settings")

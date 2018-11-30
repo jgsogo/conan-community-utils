@@ -30,7 +30,9 @@ class Package(object):
 
     @property
     def license(self):
-        return self._json_data['licenses'][0]
+        licenses = self._json_data['licenses']
+        assert len(licenses) == 1, licenses
+        return licenses[0]
 
     @property
     def homepage(self):

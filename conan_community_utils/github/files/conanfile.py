@@ -47,6 +47,10 @@ class ConanFile(FileView):
         visitor.visit(root)
         self._attribs = visitor.conanfile_attribs
 
+    @staticmethod
+    def expected(**context):
+        raise ValueError("It makes no sense to provide an expected conanfile.py")
+
 
 if __name__ == '__main__':
     conanfile = """

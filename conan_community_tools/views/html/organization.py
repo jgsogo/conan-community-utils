@@ -1,8 +1,8 @@
 from functools import partial
 
-from conan_community_utils.models.github.organization import Organization
-from conan_community_utils.views.html._html_mixin import HTMLMixin
-from conan_community_utils.views.html.recipe import RecipeHTML
+from conan_community_tools.github.organization import Organization
+from conan_community_tools.views.html._html_mixin import HTMLMixin
+from conan_community_tools.views.html.recipe import RecipeHTML
 
 
 class OrganizationHTML(HTMLMixin, Organization):

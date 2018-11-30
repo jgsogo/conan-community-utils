@@ -4,23 +4,23 @@ from datetime import datetime, timedelta
 import logging
 from github import Github
 
+from conan_community_tools.environment import GITHUB_TOKEN
+
 log = logging.getLogger(__name__)
 
 
-def get_api_object():
-    gh = Github(os.getenv("GITHUB_TOKEN"))
-    user = gh.get_user()
-    log.info(f"Authenticated in Github as user '{user.name}'")
-    #log.info(f" - permissions for '{user.login}': {gh.get_user(login=user.login).permissions}")
+def get_client():
+    token = os.getenv(GITHUB_TOKEN)
+    if not token:
+        raise EnvironmentError(f"Provide env variable '{GITHUB_TOKEN}'")
+
+    gh = Github(token)
     return gh
 
-api_object = get_api_object()
 
-
-def get_rate_limit(raise_at=500):
-    global api_object
-    rates = api_object.rate_limiting
-    reset_in = datetime.fromtimestamp(api_object.rate_limiting_resettime) - datetime.now()
+def get_rate_limit(client, raise_at=500):
+    rates = client.rate_limiting
+    reset_in = datetime.fromtimestamp(client.rate_limiting_resettime) - datetime.now()
     reset_in = reset_in - timedelta(microseconds=reset_in.microseconds)
     log.debug(f"Rate limit: {rates[0]}/{rates[1]} (reset in {reset_in})")
     if raise_at and rates[0] <= raise_at:

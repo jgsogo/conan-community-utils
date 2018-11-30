@@ -1,4 +1,5 @@
 
+import os
 import dateutil.parser
 import requests
 import yaml
@@ -6,11 +7,19 @@ from urllib.parse import urlencode, quote
 from pprint import pformat
 
 from ._base import CIBase, LastBuildInfo
+from conan_community_tools.environment import TRAVIS_TOKEN
 
 import logging
 log = logging.getLogger(__name__)
 
 TRAVIS_URL = 'https://api.travis-ci.org'
+
+
+def get_client():
+    token = os.getenv(TRAVIS_TOKEN)
+    if not token:
+        raise EnvironmentError(f"Provide env variable '{TRAVIS_TOKEN}'")
+    return Travis(token=token)
 
 
 class Travis(CIBase):
@@ -22,6 +31,17 @@ class Travis(CIBase):
     def headers(self):
         return {'Travis-API-Version': '3',
                 'Authorization': f'token {self._token}'}
+
+    def get_user(self):
+        log.debug(f"Travis::get_info()")
+        url = f'{self._url}/user'
+        r = requests.get(url=url, headers=self.headers())
+        if r.status_code != 200:
+            raise ValueError(f"Cannot get user info: {r.content}")
+
+        r = r.json()
+        log.debug(f"{pformat(r)}")
+        return r
 
     @classmethod
     def _translate_state(cls, state):

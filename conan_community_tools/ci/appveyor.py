@@ -1,4 +1,5 @@
 
+import os
 import dateutil.parser
 import requests
 import yaml
@@ -6,11 +7,20 @@ from urllib.parse import urlencode, quote
 from pprint import pformat
 
 from ._base import CIBase, LastBuildInfo
+from conan_community_tools.environment import APPVEYOR_ACCOUNT, APPVEYOR_TOKEN
 
 import logging
 log = logging.getLogger(__name__)
 
 APPVEYOR_URL = 'https://ci.appveyor.com/api'
+
+
+def get_client():
+    token = os.getenv(APPVEYOR_TOKEN)
+    account = os.getenv(APPVEYOR_ACCOUNT)
+    if not token or not account:
+        raise EnvironmentError(f"Provide env variables '{APPVEYOR_TOKEN}' and '{APPVEYOR_ACCOUNT}'")
+    return Appveyor(token=token, account=account)
 
 
 class Appveyor(CIBase):
@@ -23,6 +33,17 @@ class Appveyor(CIBase):
     def headers(self):
         return {"Authorization": f"Bearer {self._token}",
                 "Content-Type": "application/json"}
+
+    def get_users(self):
+        log.debug(f"Appveyor::get_users()")
+        url = f"{self._url}/users"
+        r = requests.get(url=url, headers=self.headers())
+        if r.status_code != 200:
+            raise ValueError(f"Cannot get user info: {r.content}")
+        r = r.json()
+        log.debug(f'{pformat(r)}')
+        return r
+
 
     @classmethod
     def _translate_state(cls, state):

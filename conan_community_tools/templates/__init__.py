@@ -8,7 +8,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
 
 
-env = Environment(loader=PackageLoader('conan_community_utils', 'templates'),
+env = Environment(loader=PackageLoader('conan_community_tools', 'templates'),
                   autoescape=select_autoescape(['html', 'xml']))
 
 

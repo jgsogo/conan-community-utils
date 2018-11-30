@@ -1,6 +1,6 @@
 
-from conan_community_utils.utils.file_view import FileView
-from conan_community_utils.templates import render
+from conan_community_tools.utils.file_view import FileView
+from conan_community_tools.templates import render
 
 
 class AppveyorYML(FileView):

@@ -1,6 +1,6 @@
 
 import functools
-from .api import get_api_object
+from .api import get_client
 from .recipe import Recipe
 
 import logging
@@ -11,7 +11,7 @@ class Organization(object):
     RecipeClass = Recipe
 
     def __init__(self, name):
-        self._gh = get_api_object()
+        self._gh = get_client()
         self._github_org = self._gh.get_organization(login=name)
 
     def __str__(self):
@@ -22,13 +22,16 @@ class Organization(object):
         return self._github_org.name
 
     @functools.lru_cache()
-    def get_recipes(self):
+    def get_recipes(self, re_pattern=None):
         ret = []
         for repo in self._github_org.get_repos('all'):
             if Recipe.is_recipe(repo.name):
-                ret.append(self.RecipeClass(repo=repo))
+                if re_pattern and not re_pattern.match(repo.name):
+                    log.info(f"Repo '{repo.name}' discarded by pattern")
+                else:
+                    ret.append(self.RecipeClass(repo=repo))
             else:
-                log.debug(f"Repository '{self}/{repo.name}' discarded as recipe")
+                log.info(f"Repository '{self}/{repo.name}' discarded as recipe")
         return ret
 
 

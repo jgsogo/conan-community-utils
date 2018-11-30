@@ -2,4 +2,4 @@
 .idea/
 __pycache__/
 tmp/
-
+conan_community_tools.egg-info

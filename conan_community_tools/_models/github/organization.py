@@ -1,7 +1,7 @@
 
 from github.Organization import Organization as github_Organization
 
-from conan_community_utils.models.github.recipe import Recipe
+from conan_community_tools.models.github.recipe import Recipe
 
 import logging
 log = logging.getLogger(__name__)

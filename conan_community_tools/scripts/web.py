@@ -24,15 +24,16 @@ class CLIFormatter(logging.Formatter):  # pragma: no cover
     max_length = 10
 
     def format(self, record):
-        name = record.__dict__['name'].split('.', 1)[1]
-        record.name = '~.{}'.format(name)
-        return super(CLIFormatter, self).format(record)
+        try:
+            name = record.__dict__['name'].split('.', 1)[1]
+            record.name = '~.{}'.format(name)
+            return super(CLIFormatter, self).format(record)
+        except:
+            record.name = '~.'
+            return super(CLIFormatter, self).format(record)
 
 
-def check_required_tokens(dry_run=False):
-    if dry_run:
-        return
-
+def check_required_tokens():
     # Github
     gh_client = get_github_client()
     sys.stdout.write(f"Github: authenticated as user '{gh_client.get_user().name}'\n")
@@ -69,9 +70,9 @@ def main():
     parser.add_argument("-v", "--verbose", dest="verbose_count",
                         action="count", default=0,
                         help="increases log verbosity for each occurence.")
-    parser.add_argument("--dry-run", dest="dry_run",
+    parser.add_argument("--local", dest="local",
                         action='store_true', default=False,
-                        help="Go as fast as possible (won't generate output)")
+                        help="If we are running local, base_url will be equal to output-path")
     #parser.add_argument('--base-url', help='URL to webpage', required=True)
     parser.add_argument('--output-path', dest='output_path',
                         help='Path to store generated content', required=True)
@@ -81,7 +82,7 @@ def main():
     args = parser.parse_args()
 
     # Configure logging
-    my_formatter = CLIFormatter('[%(levelname)-8s] %(name)-36s (%(lineno)d): %(message)s')
+    my_formatter = CLIFormatter('[%(levelname)-8s] %(name)-20s (%(lineno)d): %(message)s')
     handler = logging.StreamHandler()
     handler.setFormatter(my_formatter)
     # logging.basicConfig(stream=sys.stderr, level=logging.INFO,
@@ -97,7 +98,7 @@ def main():
 
     try:
         # Check required environment variables (connections to APIs)
-        check_required_tokens(args.dry_run)
+        check_required_tokens()
 
         # Handle output path
         output_path = os.path.abspath(args.output_path)
@@ -114,49 +115,45 @@ def main():
         with open(configuration) as f:
             config = yaml.load(f.read())
 
+        base_url = config['base_url']
+        if args.local:
+            base_url = output_path
+        if not base_url[-1] == '/':
+            base_url += '/'
         copy_assets(output_path)
 
         # Get organization
-        org = OrganizationHTML(name=config['organization']['name'], base_url=config['base_url'])
+        org = OrganizationHTML(name=config['organization']['name'], base_url=base_url)
         sys.stdout.write(f"Work on organization: {org}\n")
         sys.stdout.write(f" - base_url: {org._base_url}\n")
-        recipe_pattern = config['oroganization'].get('recipe-pattern', 'conan-[\w_]+')
+        recipe_pattern = config['organization'].get('recipe_pattern', 'conan-[\w_]+')
         sys.stdout.write(f" - recipe_pattern: {recipe_pattern}\n")
         recipe_pattern = re.compile(recipe_pattern)
 
-        all_recipes = org.get_recipes()
-        for i, recipe in enumerate(all_recipes, 1):
-            sys.stdout.write(f"[{i}/{len(all_recipes)}] {recipe}")
-
-        exit(0)
-        org_name = config['organization']['name']
-        org = gh.get_organization(login=name)
-        org = OrganizationHTML(github_org=org, base_url=base_url)
-        all_recipes = org.get_recipes()
-
+        # Work on recipes
         errors = []
-        for recipe in all_recipes:
+        all_recipes = org.get_recipes(re_pattern=recipe_pattern)
+        for i, recipe in enumerate(all_recipes, 1):
+            sys.stdout.write(f"[{i}/{len(all_recipes)}] {recipe}\n")
             try:
-                rate_limits(gh, raise_at=500)
-                log.info(f"Rendering recipe '{recipe}'")
-                recipe.render(output_folder=output_folder, all_recipes=all_recipes)
+                recipe.render(output_folder=output_path, all_recipes=all_recipes)
             except Exception as e:
                 msg = f">> ERROR rendering recipe '{recipe}': ({type(e)}) {e}"
                 errors.append([str(recipe), msg])
-                log.error(msg)
+                sys.stderr.write(msg + "\n")
+
                 import traceback
-                traceback.print_exc()
+                log.debug(traceback.format_exc())
 
-        index = org.render(output_folder=output_folder, errors=errors, all_recipes=all_recipes)
-        log.info(f"HTML index: {index}")
-
-        return index
-
+        index = org.render(output_folder=output_path, errors=errors, all_recipes=all_recipes)
+        sys.stdout.write(f"HTML index: {index}\n")
 
     except KeyboardInterrupt:
         sys.stdout.write("User interrupted. Ok")
     except Exception as e:
         sys.stderr.write(f"Unhandled error ({type(e)}): {e}")
+        import traceback
+        traceback.print_exc()
 
     sys.stdout.write("=====\n")
     return

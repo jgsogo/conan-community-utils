@@ -25,13 +25,10 @@ class Organization(object):
     def get_recipes(self, re_pattern=None):
         ret = []
         for repo in self._github_org.get_repos('all'):
-            if Recipe.is_recipe(repo.name):
-                if re_pattern and not re_pattern.match(repo.name):
-                    log.info(f"Repo '{repo.name}' discarded by pattern")
-                else:
-                    ret.append(self.RecipeClass(repo=repo))
+            if re_pattern and not re_pattern.match(repo.name):
+                log.info(f"Repo '{repo.name}' discarded by organization recipe pattern")
             else:
-                log.info(f"Repository '{self}/{repo.name}' discarded as recipe")
+                ret.append(self.RecipeClass(repo=repo))
         return ret
 
 

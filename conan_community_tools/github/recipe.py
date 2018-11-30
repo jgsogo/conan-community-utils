@@ -5,14 +5,14 @@ import functools
 from github.Repository import Repository
 
 from .files import ConanFile, Readme, TravisYML, AppveyorYML, BuildPy, SettingsYML
-from conan_community_utils.ci.travis import Travis
-from conan_community_utils.ci.appveyor import Appveyor
-from conan_community_utils.storages.bintray.api import Bintray
+from conan_community_tools.ci.travis import Travis
+from conan_community_tools.ci.appveyor import Appveyor
+from conan_community_tools.storages.bintray.api import Bintray
 
 """
-from conan_community_utils.models.travis import Travis
-from conan_community_utils.models.appveyor import Appveyor
-from conan_community_utils.models.bintray import Bintray
+from conan_community_tools.models.travis import Travis
+from conan_community_tools.models.appveyor import Appveyor
+from conan_community_tools.models.bintray import Bintray
 """
 
 import logging
@@ -32,10 +32,6 @@ class Recipe(object):
 
     def __str__(self):
         return self.id
-
-    @classmethod
-    def is_recipe(cls, repo_id):
-        return bool(re.match(r"conan-[\w_]+", repo_id, re.IGNORECASE))
 
     @classmethod
     def is_release_branch(cls, branch):
@@ -156,7 +152,7 @@ class Recipe(object):
 if __name__ == "__main__":
     import os
     import argparse
-    from conan_community_utils.github.api import api_object as g
+    from conan_community_tools.github.api import api_object as g
 
     parser = argparse.ArgumentParser(description='Run Appveyor example')
     parser.add_argument('--repo', help='Repo name')

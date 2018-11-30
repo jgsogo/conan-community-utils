@@ -1,6 +1,6 @@
 import os
 
-from conan_community_utils import templates
+from conan_community_tools import templates
 
 import logging
 log = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 
 import ast
 
-from conan_community_utils.utils.file_view import FileView
+from conan_community_tools.utils.file_view import FileView
 
 
 class MyVisitor(ast.NodeVisitor):

@@ -1,7 +1,7 @@
 
 
-from conan_community_utils.utils.file_view import FileView
-from conan_community_utils.templates import render
+from conan_community_tools.utils.file_view import FileView
+from conan_community_tools.templates import render
 
 
 class BuildPy(FileView):
@@ -18,8 +18,8 @@ if __name__ == "__main__":
     import os
     import logging
     import argparse
-    from conan_community_utils.github.api import api_object as g
-    from conan_community_utils.github.recipe import Recipe
+    from conan_community_tools.github.api import api_object as g
+    from conan_community_tools.github.recipe import Recipe
 
     parser = argparse.ArgumentParser(description='Run Appveyor example')
     parser.add_argument('--repo', help='Repo name')

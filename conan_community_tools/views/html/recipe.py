@@ -4,19 +4,15 @@ import functools
 from slugify import slugify
 from collections import defaultdict
 
-from conan_community_utils.models import github
-from conan_community_utils.views.html._html_mixin import HTMLMixin
-from conan_community_utils.templates import render_check
+from conan_community_tools.github.recipe import Recipe
+from conan_community_tools.views.html._html_mixin import HTMLMixin
+from conan_community_tools.templates import render_check
 
 import logging
 log = logging.getLogger(__name__)
 
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-APPVEYOR_TOKEN = os.getenv("APPVEYOR_TOKEN")
-
-
-class RecipeHTML(HTMLMixin, github.Recipe):
+class RecipeHTML(HTMLMixin, Recipe):
     detail_url = '{self.id}/detail/{branch}.html'
 
     def __init__(self, organization, *args, **kwargs):
@@ -45,6 +41,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
 
     @functools.lru_cache()
     def _grab_warnings(self, branch):
+        log.debug(f"RecipeHTML::_grab_warnings(branch='{branch}') for recipe '{self}'")
 
         def __count_warnings_errors(str_triage):
             nonlocal n_warnings
@@ -84,15 +81,15 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                 __count_warnings_errors(str_triage)
                 return field, render_check(str_triage, str_msg), lhs, rhs
 
-            bintray_repo = self.get_bintray_repo()
+            bintray_repo = self.get_bintray_package()
             if bintray_repo:
                 github_bintray = {'headers': ['', '', 'Github', 'Bintray'],
                                   'rows': [
-                                      ['name', '', self._repo.name, bintray_repo['name']],
-                                      _row('Description', self._repo.description, bintray_repo["desc"], 'error'),
-                                      _row('Homepage', self._repo.homepage, bintray_repo["website_url"], 'error'),
-                                      _row('Topics', self.get_topics(), bintray_repo["labels"], 'error'),
-                                      _row('License', self.get_license(), bintray_repo["licenses"], 'error'),
+                                      ['name', '', self._repo.name, bintray_repo.name],
+                                      _row('Description', self._repo.description, bintray_repo.description, 'error'),
+                                      _row('Homepage', self._repo.homepage, bintray_repo.homepage, 'error'),
+                                      _row('Topics', self.get_topics(), bintray_repo.topics, 'error'),
+                                      _row('License', self.get_license(), bintray_repo.license, 'error'),
                                   ]}
 
                 ret['Github project -vs- Bintray'] = github_bintray
@@ -126,7 +123,7 @@ class RecipeHTML(HTMLMixin, github.Recipe):
             # Conanfile -vs- Bintray repo
             conanfile = None
             try:
-                conanfile = self.get_conanfile(branch=branch)
+                conanfile = self.get_conanfile_file(branch=branch)
                 if not conanfile:
                     rows.append([render_check('error', 'error'), f"Branch {branch} doesn't have a conanfile!"])
                     __count_warnings_errors('error')
@@ -134,8 +131,8 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                 rows.append([render_check('error', 'error'), f"Branch {branch}: failed to get conanfile: {e}"])
                 __count_warnings_errors('error')
 
-            bintray_pck = self.get_bintray_package(branch=branch)
-            if self.is_release_branch(branch_name=branch) and not bintray_pck:
+            bintray_pck = self.get_bintray_package_version(branch=branch)
+            if self.is_release_branch(branch=branch) and not bintray_pck:
                 rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch} (and it is a release branch)!"])
                 __count_warnings_errors('error')
 
@@ -154,11 +151,11 @@ class RecipeHTML(HTMLMixin, github.Recipe):
                                      'rows': [
                                          _row('Name', conanfile._attribs['name'], bintray_pck.name, 'error'),
                                          _row('Version', conanfile._attribs['version'], bintray_pck.version, 'error'),
-                                         _row('Url', conanfile._attribs.get('url', None), bintray_pck._json['vcs_url'], 'error'),
-                                         _row('Homepage', conanfile._attribs.get('homepage', None), bintray_pck._json['website_url'], 'error'),
-                                         _row('Topics', conanfile._attribs.get('topics', None), bintray_pck._json['labels'], 'error'),
-                                         _row('License', conanfile._attribs.get('license', None), bintray_pck._json['licenses'], 'error'),
-                                         _row('Description', conanfile._attribs.get('description', None), bintray_pck._json['desc'], 'error'),
+                                         #_row('Url', conanfile._attribs.get('url', None), bintray_pck._json['vcs_url'], 'error'),
+                                         #_row('Homepage', conanfile._attribs.get('homepage', None), bintray_pck._json['website_url'], 'error'),
+                                         _row('Topics', conanfile._attribs.get('topics', None), bintray_pck.topics, 'error'),
+                                         #_row('License', conanfile._attribs.get('license', None), bintray_pck._json['licenses'], 'error'),
+                                         _row('Description', conanfile._attribs.get('description', None), bintray_pck.description, 'error'),
 
                                      ]}
                 ret['conanfile.py -vs- Bintray'] = bintray_conanfile

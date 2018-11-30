@@ -4,11 +4,11 @@ import re
 import functools
 from github.Repository import Repository as github_Repository
 
-from conan_community_utils.models.travis import Travis
-from conan_community_utils.models.appveyor import Appveyor
-from conan_community_utils.models.bintray import Bintray
-from conan_community_utils.utils.file_view import FileView
-from conan_community_utils.models.github.conanfile import ConanFile
+from conan_community_tools.models.travis import Travis
+from conan_community_tools.models.appveyor import Appveyor
+from conan_community_tools.models.bintray import Bintray
+from conan_community_tools.utils.file_view import FileView
+from conan_community_tools.models.github.conanfile import ConanFile
 
 import logging
 log = logging.getLogger(__name__)

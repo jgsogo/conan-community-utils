@@ -10,11 +10,11 @@
       </button>
     </div>
 
-    {% set status, url = recipe.get_travis_status(branch=recipe.active_branch) %}
-    <p>Travis: <a href="{{ url }}"><img alt="{{ status }}" src="https://travis-ci.org/{{ recipe.full_name }}.svg?branch={{ recipe.active_branch }}"/></a></p>
+    {% set status = recipe.get_travis_status(branch=recipe.active_branch) %}
+    <p>Travis: <a href="{{ status.url }}"><img alt="{{ status.status }}" src="{{ status.image_url }}"/></a></p>
 
-    {% set status, url = recipe.get_appveyor_status(branch=recipe.active_branch) %}
-    <p>Appveyor: <a href="{{ url }}"><img alt="{{ status }}" src="https://ci.appveyor.com/api/projects/status/github/{{ recipe.full_name }}?branch={{ recipe.active_branch }}&svg=true"/></a></p>
+    {% set status = recipe.get_appveyor_status(branch=recipe.active_branch) %}
+    <p>Appveyor: <a href="{{ status.url }}"><img alt="{{ status.status }}" src="{{ status.image_url }}"/></a></p>
 
 
     {% set tables, _, _ = recipe._grab_warnings(branch=recipe.active_branch) %}

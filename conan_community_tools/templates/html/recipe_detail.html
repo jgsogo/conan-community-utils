@@ -8,9 +8,9 @@
     </div>
     <div class="btn-group mr-2">
         <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.get_github_url() }}" role="button">Github <span data-feather="external-link"></span></a>
-        {% set bintray_pck=recipe.get_bintray_package(branch=recipe.active_branch) %}
-        {% if bintray_pck %}
-            <a class="btn btn-sm btn-outline-secondary" href="{{ bintray_pck.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
+        {% set bintray_pck_version=recipe.get_bintray_package_version(branch=recipe.active_branch) %}
+        {% if bintray_pck_version %}
+            <a class="btn btn-sm btn-outline-secondary" href="{{ bintray_pck_version.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
         {% endif %}
     </div>
     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" id="branchesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

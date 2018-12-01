@@ -11,6 +11,7 @@ class LastBuildInfo(object):
         UNKNOWN = 1
         SUCCESS = 2
         FAILED = 3
+        CANCELED = 4
 
     status = BuildStatus.UNKNOWN
     url = None

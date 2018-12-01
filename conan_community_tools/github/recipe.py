@@ -117,6 +117,7 @@ class Recipe(object):
 
     @functools.lru_cache()
     def get_travis_status(self, branch):
+        log.debug(f"Recipe::get_travis_status(branch='{branch}')")
         try:
             return self.travis.get_last_build(repo=self.full_name, branch=branch)
         except Exception as e:
@@ -127,6 +128,7 @@ class Recipe(object):
 
     @functools.lru_cache()
     def get_appveyor_status(self, branch):
+        log.debug(f"Recipe::get_appveyor_status(branch='{branch}')")
         try:
             return self.appveyor.get_last_build(repo=self.full_name, branch=branch)
         except Exception as e:

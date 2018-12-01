@@ -206,7 +206,7 @@ class RecipeHTML(HTMLMixin, Recipe):
 
         data = []
         for candidate in candidate_files:
-            diff = candidate.diff(recipe=self, config=self._config)
+            diff = candidate.diff(recipe=self, config=self._config, branch=branch)
             if diff.content:
                 file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=diff)
                 data.append({'title': diff.name, 'url': file_tpl.url,

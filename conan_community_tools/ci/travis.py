@@ -47,6 +47,8 @@ class Travis(CIBase):
     def _translate_state(cls, state):
         if state == "passed":
             return LastBuildInfo.BuildStatus.SUCCESS
+        elif state == "canceled":
+            return LastBuildInfo.BuildStatus.CANCELED
         else:
             log.error(f"Unknown state value: '{state}'")
             return LastBuildInfo.BuildStatus.UNKNOWN

@@ -143,7 +143,7 @@ def main():
                 sys.stderr.write(msg + "\n")
 
                 import traceback
-                log.debug(traceback.format_exc())
+                log.error(traceback.format_exc())
 
         index = org.render(output_folder=output_path, errors=errors, all_recipes=all_recipes)
         sys.stdout.write(f"HTML index: {index}\n")

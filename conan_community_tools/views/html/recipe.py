@@ -73,6 +73,7 @@ class RecipeHTML(HTMLMixin, Recipe):
                                   _row('Description', self._repo.description, 'warning', msg_fail='Add description to repository'),
                                   _row("Github settings", self.get_github_settings_file(), 'warning', msg_fail='Provide a Github settings file'),
                                   _row("Files", not len(self._get_file_diffs(branch=None)), 'error', msg_fail='Modify some files to standards (see tabs)'),
+                                  _row("Bintray", self.get_bintray_package(), 'error', msg_fail='Not in Bintray!'),
                               ]}
             ret['Github project configuration'] = github_project
 
@@ -140,8 +141,7 @@ class RecipeHTML(HTMLMixin, Recipe):
                 __count_warnings_errors('error')
 
             for it in self._get_file_diffs(branch=branch):
-                rows.append([render_check('error', 'error'),
-                             f"Differences in file {it['title']} (see tab)"])
+                # rows.append([render_check('error', 'error'), f"Differences in file {it['title']} (see tab)"])
                 __count_warnings_errors('error')
 
             if rows:
@@ -195,6 +195,7 @@ class RecipeHTML(HTMLMixin, Recipe):
         if not branch:
             # Render pages associated with the `default_branch` or the repo itself
             candidate_files = [self.get_github_settings_file(), ]
+            # TODO: Settings (env variables) for Travis and Appveyor
         else:
             # Render pages for each of the branches
             candidate_files = [self.get_appveyor_file(branch=branch),
@@ -202,8 +203,7 @@ class RecipeHTML(HTMLMixin, Recipe):
                                self.get_readme_file(branch=branch),
                                self.get_travis_file(branch=branch)]
 
-            candidate_files = [x for x in candidate_files if x is not None]
-
+        candidate_files = [x for x in candidate_files if x is not None]
         data = []
         for candidate in candidate_files:
             diff = candidate.diff(recipe=self, config=self._config, branch=branch)

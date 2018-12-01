@@ -69,30 +69,34 @@ class Bintray(object):
         r = requests.get(url, auth=self._auth, verify=True)
         if r.status_code != 200:
             # log.error(f"Package {pck_name} not found (url: {url}): {r.content}")
-            raise RuntimeError(f"Package {pck_name} not found (url: {url}): {r.content}")
+            raise RuntimeError(f"Package {pck_name} not found in Bintray (url: {url}): {r.content}")
         r = r.json()
         log.debug(f" - {r}")
 
         return Package(json_data=r, subject=self.subject, repo=self.repo)
 
-    def get_package_version(self, repo_name, user, branch, only_if_stable=True):
+    def get_package_version(self, repo_name, user, branch, only_if_stable=True, is_error=True):
         log.debug(f"Bintray::get_package_version(repo_name='{repo_name}', user='{user}', branch='{branch}')")
 
-        library_name = self.repo_to_library_name(repo_name)
-        pck_name = ':'.join([library_name, user])
-        version = self.branch_to_version(branch, only_if_stable=only_if_stable)
-        channel = 'stable'  # If nothing raises, it is stable
-        version_str = ':'.join([version, channel])
+        try:
+            library_name = self.repo_to_library_name(repo_name)
+            pck_name = ':'.join([library_name, user])
+            version = self.branch_to_version(branch, only_if_stable=only_if_stable)
+            channel = 'stable'  # If nothing raises, it is stable
+            version_str = ':'.join([version, channel])
 
-        url = f"{BINTRAY_API_URL}/packages/{self.subject}/{self.repo}/{quote(pck_name, safe='')}/versions/{quote(version_str, safe='')}"
-        r = requests.get(url, auth=self._auth, verify=True)
-        if r.status_code != 200:
-            # log.error(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
-            raise RuntimeError(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
-        r = r.json()
-        log.debug(f" - {r}")
+            url = f"{BINTRAY_API_URL}/packages/{self.subject}/{self.repo}/{quote(pck_name, safe='')}/versions/{quote(version_str, safe='')}"
+            r = requests.get(url, auth=self._auth, verify=True)
+            if r.status_code != 200:
+                # log.error(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
+                raise RuntimeError(f"Package {pck_name} (version='{version_str}') not found (url: {url}): {r.content}")
+            r = r.json()
+            log.debug(f" - {r}")
 
-        return PackageVersion(json_data=r, subject=self.subject, repo=self.repo)
+            return PackageVersion(json_data=r, subject=self.subject, repo=self.repo)
+        except Exception as e:
+            if is_error:
+                raise
 
 
 if __name__ == '__main__':

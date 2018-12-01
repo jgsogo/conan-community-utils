@@ -59,7 +59,7 @@ class Appveyor(CIBase):
         if '/' in repo:
             return repo.split("/")[1]
 
-    def _get_last_build(self, repo_full_name, branch, *args, **kwargs):
+    def _get_last_build(self, repo_full_name, branch, is_error=True, *args, **kwargs):
         log.debug(f"Appveyor::get_last_build(repo={repo_full_name}, branch={branch})")
 
         repo = self._fix_repo_name(repo_full_name)
@@ -80,8 +80,9 @@ class Appveyor(CIBase):
             ret.image_url = f"https://ci.appveyor.com/api/projects/status/github/{quote(repo_full_name, safe='')}?branch={r['build']['branch']}&svg=true"
 
         except Exception as e:
-            log.error(f"Error retrieving information from last build status for repo '{repo}' "
-                      f"(branch='{branch}'): {e}. Returned json was:\n{pformat(r)}")
+            if is_error:
+                log.error(f"Error retrieving information from last build status for repo '{repo}' "
+                          f"(branch='{branch}'): {e}. Returned json was:\n{pformat(r)}")
         finally:
             return ret
 

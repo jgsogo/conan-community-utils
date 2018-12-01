@@ -49,11 +49,13 @@ class Travis(CIBase):
             return LastBuildInfo.BuildStatus.SUCCESS
         elif state == "canceled":
             return LastBuildInfo.BuildStatus.CANCELED
+        elif state in ["failed", "errored"]:
+            return LastBuildInfo.BuildStatus.FAILED
         else:
             log.error(f"Unknown state value: '{state}'")
             return LastBuildInfo.BuildStatus.UNKNOWN
 
-    def _get_last_build(self, repo, branch, *args, **kwargs):
+    def _get_last_build(self, repo, branch, is_error=True, *args, **kwargs):
         log.debug(f"Travis::get_last_build(repo={repo}, branch={branch})")
 
         url = f'{self._url}/repo/{quote(repo, safe="")}/builds'
@@ -71,12 +73,15 @@ class Travis(CIBase):
             ret.url = 'https://travis-ci.org/' + build['repository']['slug'] + '/builds/' + build_id
             ret.commit['sha'] = build["commit"]["sha"]
             ret.commit['message'] = build["commit"]["message"]
-            ret.commit['date'] = dateutil.parser.parse(build["commit"]["committed_at"])
+            date = build["commit"]["committed_at"]
+            if date:
+                ret.commit['date'] = dateutil.parser.parse(date)
             ret.image_url = f'https://travis-ci.org/{build["repository"]["slug"]}.svg?branch={build["branch"]["name"]}'
 
         except Exception as e:
-            log.error(f"Error retrieving information from last build status for repo '{repo}' "
-                      f"(branch='{branch}'): {e}. Returned json was:\n{pformat(r)}")
+            if is_error:
+                log.error(f"Error retrieving information from last build status for repo '{repo}' "
+                          f"(branch='{branch}'): {e}. Returned json was:\n{pformat(r)}")
         finally:
             return ret
 

@@ -39,7 +39,7 @@ class Recipe(object):
         return self.id
 
     def is_release_branch(self, branch):
-        return self._stable_branch_pattern.match(branch)
+        return bool(self._stable_branch_pattern.match(branch))
 
     @property
     def id(self):
@@ -80,46 +80,47 @@ class Recipe(object):
 
     @functools.lru_cache()
     def get_github_settings_file(self):
-        return SettingsYML(content="<fck settings content>")
-        return self._get_file(branch=self.default_branch, FileClass=SettingsYML, filepath='.github')
+        return self._get_file(branch=self.default_branch, FileClass=SettingsYML, filepath='.github',
+                              is_error=False)
 
     # Branch level calls
-    def _get_file(self, branch, FileClass, filepath=''):
+    def _get_file(self, branch, FileClass, filepath='', is_error=True):
         try:
             path = os.path.join(filepath, FileClass.name)
             content = self._repo.get_contents(path, ref=branch).decoded_content.decode("utf-8")
         except Exception as e:
-            log.error(f"Cannot retrieve '{path}' (repo {self.full_name}) from "
-                      f"branch {branch}): ({type(e)}) {e}")
+            if is_error:
+                log.error(f"Cannot retrieve '{path}' (repo '{self.full_name}') from "
+                          f"branch '{branch}'): ({type(e)}) {e}")
             return None
         else:
             return FileClass(content=content)
 
     @functools.lru_cache()
     def get_conanfile_file(self, branch):
-        return self._get_file(branch=branch, FileClass=ConanFile)
+        return self._get_file(branch=branch, FileClass=ConanFile, is_error=self.is_release_branch(branch=branch))
 
     @functools.lru_cache()
     def get_readme_file(self, branch):
-        return self._get_file(branch=branch, FileClass=Readme)
+        return self._get_file(branch=branch, FileClass=Readme, is_error=self.is_release_branch(branch=branch))
 
     @functools.lru_cache()
     def get_travis_file(self, branch):
-        return self._get_file(branch=branch, FileClass=TravisYML)
+        return self._get_file(branch=branch, FileClass=TravisYML, is_error=self.is_release_branch(branch=branch))
 
     @functools.lru_cache()
     def get_appveyor_file(self, branch):
-        return self._get_file(branch=branch, FileClass=AppveyorYML)
+        return self._get_file(branch=branch, FileClass=AppveyorYML, is_error=self.is_release_branch(branch=branch))
 
     @functools.lru_cache()
     def get_buildpy_file(self, branch):
-        return self._get_file(branch=branch, FileClass=BuildPy)
+        return self._get_file(branch=branch, FileClass=BuildPy, is_error=self.is_release_branch(branch=branch))
 
     @functools.lru_cache()
     def get_travis_status(self, branch):
         log.debug(f"Recipe::get_travis_status(branch='{branch}')")
         try:
-            return self.travis.get_last_build(repo=self.full_name, branch=branch)
+            return self.travis.get_last_build(repo=self.full_name, branch=branch, is_error=self.is_release_branch(branch=branch))
         except Exception as e:
             if self.get_travis_file(branch=branch):
                 log.error(f"Cannot get last build status from Travis "
@@ -130,11 +131,11 @@ class Recipe(object):
     def get_appveyor_status(self, branch):
         log.debug(f"Recipe::get_appveyor_status(branch='{branch}')")
         try:
-            return self.appveyor.get_last_build(repo=self.full_name, branch=branch)
+            return self.appveyor.get_last_build(repo=self.full_name, branch=branch, is_error=self.is_release_branch(branch=branch))
         except Exception as e:
             if self.get_appveyor_file(branch=branch):
                 log.error(f"Cannot get last build status from Appveyor "
-                          f"for branch '{branch}: ({type(e)}) {e}'")
+                          f"for branch '{branch}': ({type(e)}) {e}'")
             return None
 
     # Related to BINTRAY
@@ -149,7 +150,8 @@ class Recipe(object):
     @functools.lru_cache()
     def get_bintray_package_version(self, branch):
         try:
-            return self.bintray.get_package_version(repo_name=self.full_name, user='conan', branch=branch)
+            return self.bintray.get_package_version(repo_name=self.full_name, user='conan',
+                                                    branch=branch, is_error=self.is_release_branch(branch=branch))
         except Exception as e:
             log.error(f"Cannot find bintray package: {e}")
             return None

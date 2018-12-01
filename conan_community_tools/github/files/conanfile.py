@@ -4,7 +4,8 @@ from conan_community_tools.utils.file_view import FileView
 
 
 class MyVisitor(ast.NodeVisitor):
-    conanfile_attribs = {}
+    def __init__(self):
+        self.conanfile_attribs = {}
 
     def visit_ClassDef(self, node):
         # Identify the Recipe one

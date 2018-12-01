@@ -214,29 +214,43 @@ class RecipeHTML(HTMLMixin, Recipe):
         return data
 
     def render(self, output_folder, **context):
-        log.debug(f"Render recipe detail '{self.id}'")
+        log.debug(f"RecipeHTML::render()")
 
         # Render pages associated with the `default_branch` or the repo itself
-        data = self._get_file_diffs(branch=None)
-        for tab_file in data:
-            tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data, **context)
-        html = super().render(output_folder=output_folder, files_in_tabs=data, **context)
+        try:
+            data = self._get_file_diffs(branch=None)
+            for tab_file in data:
+                tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data, **context)
+        except Exception as e:
+            log.error(f"Error rendering file diffs for recipe '{self}' at main branch: (type {type(e)}) {e}")
+
+        try:
+            html = super().render(output_folder=output_folder, files_in_tabs=data, **context)
+        except Exception as e:
+            log.error(f"Error rendering main branch for recipe '{self}': (type {type(e)}) {e}")
 
         # Render pages for each of the branches
         for branch in self.get_branches():
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
 
-            data = self._get_file_diffs(branch=self.active_branch)
-            conanfile = self.get_conanfile_file(branch=self.active_branch)
-            if conanfile:
-                conanfile_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=conanfile)
-                data.insert(0, {'title': conanfile.name, 'url': conanfile_tpl.url,
-                                'file': conanfile, '_html_obj': conanfile_tpl, 'errors': False})
-            for tab_file in data:
-                tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data,
-                                             **context)
-            super().render(output_folder=output_folder, files_in_tabs=data, **context)
+            try:
+                data = self._get_file_diffs(branch=self.active_branch)
+                conanfile = self.get_conanfile_file(branch=self.active_branch)
+                if conanfile:
+                    conanfile_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=conanfile)
+                    data.insert(0, {'title': conanfile.name, 'url': conanfile_tpl.url,
+                                    'file': conanfile, '_html_obj': conanfile_tpl, 'errors': False})
+                for tab_file in data:
+                    tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data,
+                                                 **context)
+            except Exception as e:
+                log.error(f"Error rendering file diffs for recipe '{self}' at branch '{self.active_branch}': (type {type(e)}) {e}")
+
+            try:
+                super().render(output_folder=output_folder, files_in_tabs=data, **context)
+            except Exception as e:
+                log.error(f"Error rendering branch '{self.active_branch}' for recipe '{self}': (type {type(e)}) {e}")
 
         self.active_branch = None
         return html

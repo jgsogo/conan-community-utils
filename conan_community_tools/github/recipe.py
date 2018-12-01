@@ -92,7 +92,6 @@ class Recipe(object):
             if is_error:
                 log.error(f"Cannot retrieve '{path}' (repo '{self.full_name}') from "
                           f"branch '{branch}'): ({type(e)}) {e}")
-            return None
         else:
             return FileClass(content=content)
 

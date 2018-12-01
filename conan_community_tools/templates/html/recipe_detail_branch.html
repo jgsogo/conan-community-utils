@@ -6,11 +6,11 @@
         {% if files_in_tabs %}
             <ul class="nav nav-tabs">
               <li class="nav-item">
-                <a class="nav-link active" href="{{ recipe.get_url(branch=recipe.active_branch) }}">Details</a>
+                <a class="nav-link{% if not file %} active{% endif %}" href="{{ recipe.get_url(branch=recipe.active_branch) }}">Details</a>
               </li>
                 {% for it in files_in_tabs %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ it['url'] }}">{{ it['title'] }}</a>
+                    <a class="nav-link{% if file and file.name == it['title'] %} active{% endif %}" href="{{ it['url'] }}">{{ it['title'] }}</a>
                   </li>
                 {% endfor %}
             </ul>
@@ -21,13 +21,6 @@
 
     {% block content_detail_tab_content %}
         <h4>Build status</h4>
-
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <strong>TODO:</strong> Parse appveyor.yml and .travis.yml to know if we are building all expected configurations (show as matrix).
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
 
         {% set status = recipe.get_travis_status(branch=recipe.active_branch) %}
         <p>Travis: <a href="{{ status.url }}"><img alt="{{ status.status }}" src="{{ status.image_url }}"/></a></p>

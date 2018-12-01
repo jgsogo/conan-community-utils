@@ -22,21 +22,24 @@ log = logging.getLogger(__name__)
 class Recipe(object):
     """ Models a conan recipe in Github """
 
-    travis = Travis(token=os.getenv("TRAVIS_TOKEN"))
-    appveyor = Appveyor(token=os.getenv("APPVEYOR_TOKEN"), account=os.getenv("APPVEYOR_ACCOUNT"))
-    bintray = Bintray(api_token=os.getenv("BINTRAY_TOKEN"), api_username=os.getenv("BINTRAY_USER"))
-
-    def __init__(self, repo):
+    def __init__(self, repo, config=None):
         assert isinstance(repo, Repository)
         self._repo = repo
+        self._config = config
+        self._stable_branch_pattern = re.compile(config['organization']['stable_branch_pattern'])
+
+        self.travis = Travis(token=os.getenv("TRAVIS_TOKEN"))
+        self.appveyor = Appveyor(token=os.getenv("APPVEYOR_TOKEN"),
+                                 account=os.getenv("APPVEYOR_ACCOUNT"))
+        self.bintray = Bintray(api_token=os.getenv("BINTRAY_TOKEN"),
+                               api_username=os.getenv("BINTRAY_USER"),
+                               config=self._config)
 
     def __str__(self):
         return self.id
 
-    @classmethod
-    def is_release_branch(cls, branch):
-        return bool(re.match(r"release/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch)) or \
-               bool(re.match(r"stable/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+", branch))
+    def is_release_branch(self, branch):
+        return self._stable_branch_pattern.match(branch)
 
     @property
     def id(self):

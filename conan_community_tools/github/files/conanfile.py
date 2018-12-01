@@ -39,8 +39,8 @@ class ConanFile(FileView):
     name = 'conanfile.py'
     language = 'python'
 
-    def __init__(self, content):
-        super().__init__(content=content)
+    def __init__(self, content, *args, **kwargs):
+        super().__init__(content=content, *args, **kwargs)
 
         root = ast.parse(self.content)
         visitor = MyVisitor()

@@ -26,9 +26,9 @@ class Readme(FileView):
     language = 'markdown'
 
     @staticmethod
-    def expected(recipe, branch, **context):
+    def expected(**context):
         template_name = 'github/README.md'
-        context.update({'recipe': recipe, 'branch': branch})
+        #context.update({'recipe': recipe, 'branch': branch})
         add_globals = {'travis_badge': travis_badge, 'appveyor_badge': appveyor_badge}
         return render(template_name, context=context, add_globals=add_globals)
 

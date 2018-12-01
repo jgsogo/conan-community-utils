@@ -15,23 +15,23 @@ log = logging.getLogger(__name__)
 BINTRAY_API_URL = 'https://bintray.com/api/v1'
 
 
-def get_client():
+def get_client(config):
     token = os.getenv(BINTRAY_TOKEN)
     user = os.getenv(BINTRAY_USER)
     if not token or not user:
         raise EnvironmentError(f"Provide env variables '{BINTRAY_TOKEN}' and '{BINTRAY_USER}'")
-    return Bintray(api_token=token, api_username=user)
+    return Bintray(api_token=token, api_username=user, config=config)
 
 
 class Bintray(object):
 
-    subject = 'conan-community'
-    repo = 'conan'
-
-    def __init__(self, api_username, api_token):
+    def __init__(self, api_username, api_token, config):
         self._url = BINTRAY_API_URL
         self._username = api_username
         self._auth = requests.auth.HTTPBasicAuth(api_username, api_token)
+
+        self.subject = config['bintray']['subject']
+        self.repo = config['bintray']['repo']
 
     def get_user_info(self):
         log.debug(f"Bintray::get_user_info()")
@@ -42,7 +42,6 @@ class Bintray(object):
         r = r.json()
         log.debug(f"{pformat(r)}")
         return r
-
 
     @classmethod
     def repo_to_library_name(cls, repo_name):

@@ -33,7 +33,7 @@ class CLIFormatter(logging.Formatter):  # pragma: no cover
             return super(CLIFormatter, self).format(record)
 
 
-def check_required_tokens():
+def check_required_tokens(config):
     # Github
     gh_client = get_github_client()
     sys.stdout.write(f"Github: authenticated as user '{gh_client.get_user().name}'\n")
@@ -57,7 +57,7 @@ def check_required_tokens():
             sys.stdout.write(f"'{it['fullName']}'\n")
 
     # Bintray
-    bintray_client = get_bintray_client()
+    bintray_client = get_bintray_client(config=config)
     user = bintray_client.get_user_info()
     sys.stdout.write(f"Bintray: connected as user '{user['name']}'\n")
 
@@ -97,8 +97,12 @@ def main():
         exit(-1)
 
     try:
+        # Parse configuration file
+        with open(configuration) as f:
+            config = yaml.load(f.read())
+
         # Check required environment variables (connections to APIs)
-        check_required_tokens()
+        check_required_tokens(config=config)
 
         # Handle output path
         output_path = os.path.abspath(args.output_path)
@@ -111,10 +115,6 @@ def main():
                 shutil.rmtree(output_path, ignore_errors=True)
         os.makedirs(output_path, exist_ok=False)
 
-        # Parse configuration file
-        with open(configuration) as f:
-            config = yaml.load(f.read())
-
         base_url = config['base_url']
         if args.local:
             base_url = output_path
@@ -123,7 +123,7 @@ def main():
         copy_assets(output_path)
 
         # Get organization
-        org = OrganizationHTML(name=config['organization']['name'], base_url=base_url)
+        org = OrganizationHTML(name=config['organization']['name'], base_url=base_url, config=config)
         sys.stdout.write(f"Work on organization: {org}\n")
         sys.stdout.write(f" - base_url: {org._base_url}\n")
         recipe_pattern = config['organization'].get('recipe_pattern', 'conan-[\w_]+')

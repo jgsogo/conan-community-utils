@@ -17,4 +17,10 @@
             <code class="{{ file.language }}">{{ file.content }}</code>
         </pre>
     </div>
+
+    <div>
+        <pre>
+            <code class="diff">{{ file.diff(recipe=recipe).content }}</code>
+        </pre>
+    </div>
 {% endblock %}

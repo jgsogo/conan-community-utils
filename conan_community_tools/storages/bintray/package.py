@@ -1,6 +1,7 @@
 
 from urllib.parse import quote
 
+
 class Package(object):
 
     def __init__(self, json_data, subject, repo):

@@ -44,7 +44,6 @@ class Appveyor(CIBase):
         log.debug(f'{pformat(r)}')
         return r
 
-
     @classmethod
     def _translate_state(cls, state):
         if state == "success":

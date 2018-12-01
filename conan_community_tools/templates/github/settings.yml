@@ -1,9 +1,9 @@
 repository:
   # name: repo-name
-  description: {{ description }}
-  homepage: {{ homepage }}
+  description: {{ recipe.description }}
+  homepage: {{ recipe.homepage }}
   # default_branch: master
-  topics: {{ topics }}
+  topics: {{ ', '.join(recipe.get_topics()) }}
 
   private: false
   has_issues: false

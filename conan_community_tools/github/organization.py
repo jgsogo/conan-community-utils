@@ -10,9 +10,10 @@ log = logging.getLogger(__name__)
 class Organization(object):
     RecipeClass = Recipe
 
-    def __init__(self, name):
+    def __init__(self, name, config=None):
         self._gh = get_client()
         self._github_org = self._gh.get_organization(login=name)
+        self._config = config
 
     def __str__(self):
         return self.id
@@ -28,7 +29,7 @@ class Organization(object):
             if re_pattern and not re_pattern.match(repo.name):
                 log.info(f"Repo '{repo.name}' discarded by organization recipe pattern")
             else:
-                ret.append(self.RecipeClass(repo=repo))
+                ret.append(self.RecipeClass(repo=repo, config=self._config))
         return ret
 
 

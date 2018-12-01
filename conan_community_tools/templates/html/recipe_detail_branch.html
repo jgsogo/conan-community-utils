@@ -10,7 +10,9 @@
               </li>
                 {% for it in files_in_tabs %}
                   <li class="nav-item">
-                    <a class="nav-link{% if file and file.name == it['title'] %} active{% endif %}" href="{{ it['url'] }}">{{ it['title'] }}</a>
+                    <a class="nav-link{% if file and file.name == it['title'] %} active{% endif %}" href="{{ it['url'] }}">
+                        {{ it['title'] }}{% if it['errors'] %} {{ render_check('error', '') }}{% endif %}
+                    </a>
                   </li>
                 {% endfor %}
             </ul>

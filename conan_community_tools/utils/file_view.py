@@ -12,7 +12,8 @@ class FileView(object):
 
     @property
     def id(self):
-        return os.path.basename(self.name)
+        root, _ = os.path.splitext(os.path.basename(self.name))
+        return root
 
     @staticmethod
     def expected(**context):

@@ -72,6 +72,7 @@ class RecipeHTML(HTMLMixin, Recipe):
                                   _row('Homepage', self._repo.homepage, 'warning', msg_fail='Add homepage to underlying library'),
                                   _row('Description', self._repo.description, 'warning', msg_fail='Add description to repository'),
                                   _row("Github settings", self.get_github_settings_file(), 'warning', msg_fail='Provide a Github settings file'),
+                                  _row("Files", not len(self._get_file_diffs(branch=None)), 'error', msg_fail='Modify some files to standards (see tabs)'),
                               ]}
             ret['Github project configuration'] = github_project
 
@@ -138,6 +139,11 @@ class RecipeHTML(HTMLMixin, Recipe):
                 rows.append([render_check('error', 'error'), f"Cannot get repository in Bintray for branch {branch} (and it is a release branch)!"])
                 __count_warnings_errors('error')
 
+            for it in self._get_file_diffs(branch=branch):
+                rows.append([render_check('error', 'error'),
+                             f"Differences in file {it['title']} (see tab)"])
+                __count_warnings_errors('error')
+
             if rows:
                 ret['Errors'] = {'headers': None, 'rows': rows}
 
@@ -185,20 +191,35 @@ class RecipeHTML(HTMLMixin, Recipe):
                         'organization': self._organization, })
         return context
 
+    def _get_file_diffs(self, branch):
+        if not branch:
+            # Render pages associated with the `default_branch` or the repo itself
+            candidate_files = [self.get_github_settings_file(), ]
+        else:
+            # Render pages for each of the branches
+            candidate_files = [self.get_appveyor_file(branch=branch),
+                               self.get_buildpy_file(branch=branch),
+                               self.get_readme_file(branch=branch),
+                               self.get_travis_file(branch=branch)]
+
+            candidate_files = [x for x in candidate_files if x is not None]
+
+        data = []
+        for candidate in candidate_files:
+            diff = candidate.diff(recipe=self, config=self._config)
+            if diff.content:
+                file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=diff)
+                data.append({'title': diff.name, 'url': file_tpl.url,
+                             'file': diff, '_html_obj': file_tpl, 'errors': True})
+        return data
+
     def render(self, output_folder, **context):
         log.debug(f"Render recipe detail '{self.id}'")
 
         # Render pages associated with the `default_branch` or the repo itself
-        files_in_default_branch = [self.get_github_settings_file(),]
-        files_in_default_branch = [x for x in files_in_default_branch if x is not None]
-        data = []
-        for file_in_default_branch in files_in_default_branch:
-            file_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=file_in_default_branch)
-            data.append({'title': file_in_default_branch.name, 'url': file_tpl.url, 'file': file_in_default_branch, '_html_obj': file_tpl})
-
+        data = self._get_file_diffs(branch=None)
         for tab_file in data:
             tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data, **context)
-
         html = super().render(output_folder=output_folder, files_in_tabs=data, **context)
 
         # Render pages for each of the branches
@@ -206,22 +227,16 @@ class RecipeHTML(HTMLMixin, Recipe):
             self.active_branch = branch
             log.debug(f"Render recipe detail '{self.id}' for branch '{self.active_branch}'")
 
-            files_in_each_branch = [self.get_appveyor_file(branch=self.active_branch),
-                                    self.get_buildpy_file(branch=self.active_branch),
-                                    self.get_readme_file(branch=self.active_branch),
-                                    self.get_travis_file(branch=self.active_branch)]
-            files_in_each_branch = [x for x in files_in_each_branch if x is not None]
-            data = []
-            for file_in_each_branch in files_in_each_branch:
-                file_tpl = FileViewHTML(base_url=self._base_url, recipe=self,
-                                        obj_file=file_in_each_branch)
-                data.append({'title': file_in_each_branch.name, 'url': file_tpl.url,
-                             'file': file_in_each_branch, '_html_obj': file_tpl})
-
+            data = self._get_file_diffs(branch=self.active_branch)
+            conanfile = self.get_conanfile_file(branch=self.active_branch)
+            if conanfile:
+                conanfile_tpl = FileViewHTML(base_url=self._base_url, recipe=self, obj_file=conanfile)
+                data.insert(0, {'title': conanfile.name, 'url': conanfile_tpl.url,
+                                'file': conanfile, '_html_obj': conanfile_tpl, 'errors': False})
             for tab_file in data:
                 tab_file['_html_obj'].render(output_folder=output_folder, files_in_tabs=data,
                                              **context)
-
             super().render(output_folder=output_folder, files_in_tabs=data, **context)
+
         self.active_branch = None
         return html

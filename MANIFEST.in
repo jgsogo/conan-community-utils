@@ -1,3 +1,7 @@
 include requirements.txt
 include README.md
 include tests/requirements.txt
+include conan_community_tools/templates/assets/css/*.css
+include conan_community_tools/templates/assets/js/*.js
+include conan_community_tools/templates/github/*
+include conan_community_tools/templates/html/*.html

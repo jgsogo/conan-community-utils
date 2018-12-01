@@ -48,6 +48,8 @@ class Appveyor(CIBase):
     def _translate_state(cls, state):
         if state == "success":
             return LastBuildInfo.BuildStatus.SUCCESS
+        elif state == "failed":
+            return LastBuildInfo.BuildStatus.FAILED
         else:
             log.error(f"Unknown state value: '{state}'")
             return LastBuildInfo.BuildStatus.UNKNOWN

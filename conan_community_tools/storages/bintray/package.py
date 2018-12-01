@@ -1,5 +1,8 @@
 
+import logging
 from urllib.parse import quote
+
+log = logging.getLogger(__name__)
 
 
 class Package(object):
@@ -32,8 +35,9 @@ class Package(object):
     @property
     def license(self):
         licenses = self._json_data['licenses']
-        assert len(licenses) == 1, licenses
-        return licenses[0]
+        if len(licenses) != 1:
+            log.debug(f"Expected one license, got '{licenses}' for package '{self}'.")
+        return ', '.join(licenses)
 
     @property
     def homepage(self):

@@ -8,63 +8,23 @@ class AppveyorYML(FileView):
     language = 'yaml'
 
     @staticmethod
-    def expected(**context):
+    def expected(config, **context):
         template_name = 'github/appveyor.yml'
 
-        # TODO: Define somewhere else:
-        global_vars = \
-            {
-                'conan_username': 'conan',
-                'conan_login_username': 'conanbot',
-                'conan_channel': 'testing',
-                'conan_upload': 'https://api.bintray.com/conan/conan-community/conan',
-                #'total_pages': 1,
-                #'build_policy': 'missing',
-            }
-
-        workers = \
-            {
-                'Visual Studio 2015':
-                    {
-                        'version': [12, 14, ],
-                        'arch': ['x86', 'x86_64', ],
-                        'build_type': ['Release', ],
-                        'runtime': ['MT', 'MD', ],
-                    },
-                'Visual Studio 2017':
-                    {
-                        'version': [15, ],
-                        'arch': ['x86', 'x86_64', ],
-                        'build_type': ['Release', ],
-                        'runtime': ['MT', 'MD', ],
-                    }
-            }
-
-        mingw_configurations = [
-            "4.9@x86_64@seh@posix",
-            "5@x86_64@seh@posix",
-            "6@x86_64@seh@posix",
-            "7@x86_64@seh@posix"
-        ]
-
-        # Explode VS workers
         visual_compilers = []
-        for w, items in workers.items():
-            for v in items['version']:
-                for a in items['arch']:
-                    for b in items['build_type']:
-                        for r in items['runtime']:
+        for worker in config['appveyor']['visual_compilers']['workers']:
+            for v in worker['versions']:
+                for a in worker['archs']:
+                    for b in worker['build_types']:
+                        for r in worker['runtimes']:
                             visual_compilers.append({
-                                'worker_image': w,
+                                'worker_image': worker['name'],
                                 'version': v,
                                 'arch': a,
                                 'build_type': b,
                                 'runtime': r
                             })
-
-        context = global_vars
-        context.update({'visual_compilers': visual_compilers,
-                        'mingw_configurations': mingw_configurations})
+        context.update({'visual_compilers': visual_compilers, 'config': config})
         return render(template_name, context=context)
 
 

@@ -8,55 +8,28 @@ class TravisYML(FileView):
     language = 'yaml'
 
     @staticmethod
-    def expected(**context):
+    def expected(config, **context):
         template_name = 'github/.travis.yml'
 
-        # TODO: Define somewhere else:
-        global_vars = \
-            {
-                'conan_username': 'conan',
-                'conan_login_username': 'conanbot',
-                'conan_channel': 'testing',
-                'conan_upload': 'https://api.bintray.com/conan/conan-community/conan',
-                # 'total_pages': 1,
-                # 'build_policy': 'missing',
-            }
+        gcc_compilers = []
+        for gcc_compiler in config['travis']['gcc_compilers']:
+            for v in gcc_compiler['versions']:
+                gcc_compilers.append({'docker': gcc_compiler['docker'], 'version': v})
 
-        def get_compilers(tuples, version='version', docker_image='docker_image'):
-            ret = []
-            for v, di in tuples:
-                ret.append({version: v, docker_image: di})
-            return ret
+        clang_compilers = []
+        for clang_compiler in config['travis']['clang_compilers']:
+            for v in clang_compiler['versions']:
+                clang_compilers.append({'docker': clang_compiler['docker'], 'version': v})
 
-        gcc_compilers = get_compilers([
-            (4.8, 'conanio/gcc48'),
-            (4.9, 'conanio/gcc49'),
-            (5, 'conanio/gcc5'),
-            (6, 'conanio/gcc6'),
-            (7, 'conanio/gcc7'),
-            (8, 'conanio/gcc8')
-        ])
+        apple_clang_compilers = []
+        for apple_clang_compiler in config['travis']['apple_clang_compilers']:
+            for v in apple_clang_compiler['versions']:
+                apple_clang_compilers.append({'osx_image': apple_clang_compiler['osx_image'], 'version': v})
 
-        clang_compilers = get_compilers([
-            (3.9, 'conanio/clang39'),
-            (4.0, 'conanio/clang40'),
-            (5.0, 'conanio/clang50'),
-            (6.0, 'conanio/clang60'),
-            (7.0, 'conanio/clang7'),
-        ])
-
-        apple_clang_compilers = get_compilers(version='version', docker_image='osx_image', tuples=[
-            (7.3, 'xcode7.3'),
-            (8.1, 'xcode8.1'),
-            (9.0, 'xcode9.0'),
-            (9.1, 'xcode9.1'),
-            (10.0, 'xcode10.0'),
-        ])
-
-        context = global_vars
         context.update({'gcc_compilers': gcc_compilers,
                         'clang_compilers': clang_compilers,
-                        'apple_clang_compilers': apple_clang_compilers})
+                        'apple_clang_compilers': apple_clang_compilers,
+                        'config': config})
         return render(template_name, context=context)
 
 

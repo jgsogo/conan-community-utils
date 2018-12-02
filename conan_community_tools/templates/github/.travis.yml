@@ -1,14 +1,14 @@
 env:
    global:
-     - CONAN_USERNAME: "{{ conan_username }}"
-     - CONAN_LOGIN_USERNAME: "{{ conan_login_username }}"
-     - CONAN_CHANNEL: "{{ conan_channel }}"
-     - CONAN_UPLOAD: "{{ conan_upload }}"
-     - CONAN_STABLE_BRANCH_PATTERN: "(release|stable)/*"
+     - CONAN_USERNAME: "{{ config['ci']['conan_username'] }}"
+     - CONAN_LOGIN_USERNAME: "{{ config['bintray']['conan_login_username'] }}"
+     - CONAN_CHANNEL: "{{ config['ci']['conan_channel'] }}"
+     - CONAN_UPLOAD: "{{ config['bintray']['conan_upload'] }}"
+     - CONAN_STABLE_BRANCH_PATTERN: "{{ config['organization']['stable_branch_pattern'] }}"
      - CONAN_UPLOAD_ONLY_WHEN_STABLE: 1 # Will only upload when the branch matches the stable pattern
      - CONAN_DOCKER_32_IMAGES: 1
-     - CONAN_TOTAL_PAGES: {{ total_pages|default(1) }}
-{% if build_policy %}     - CONAN_BUILD_POLICY: {{ build_policy }}{% endif %}
+     - CONAN_TOTAL_PAGES: {{ config['ci'].get('total_pages', 1) }}
+{% if config['ci'].get('build_policy', None) %}     - CONAN_BUILD_POLICY: {{ config['ci']['build_policy'] }}{% endif %}
 
 linux: &linux
    os: linux
@@ -27,19 +27,19 @@ stages:
 
 jobs:
    include:
-     {% for compiler in gcc_compilers %}{% for page in range(1, total_pages|default(1) + 1) %}
+     {% for compiler in gcc_compilers %}{% for page in range(1, config['ci'].get('total_pages', 1) + 1) %}
       - <<: *linux
         stage: conan-linux
-        env: CONAN_GCC_VERSIONS={{ compiler.version }} CONAN_DOCKER_IMAGE={{ compiler.docker_image }} CONAN_CURRENT_PAGE={{ page }}
+        env: CONAN_GCC_VERSIONS={{ compiler.version }} CONAN_DOCKER_IMAGE={{ compiler.docker }} CONAN_CURRENT_PAGE={{ page }}
      {% endfor %}{% endfor %}
 
-     {% for compiler in clang_compilers %}{% for page in range(1, total_pages|default(1) + 1) %}
+     {% for compiler in clang_compilers %}{% for page in range(1, config['ci'].get('total_pages', 1) + 1) %}
       - <<: *linux
         stage: conan-linux
-        env: CONAN_CLANG_VERSIONS={{ compiler.version }} CONAN_DOCKER_IMAGE={{ compiler.docker_image }} CONAN_CURRENT_PAGE={{ page }}
+        env: CONAN_CLANG_VERSIONS={{ compiler.version }} CONAN_DOCKER_IMAGE={{ compiler.docker }} CONAN_CURRENT_PAGE={{ page }}
      {% endfor %}{% endfor %}
 
-     {% for compiler in apple_clang_compilers %}{% for page in range(1, total_pages|default(1) + 1) %}
+     {% for compiler in apple_clang_compilers %}{% for page in range(1, config['ci'].get('total_pages', 1) + 1) %}
       - <<: *linux
         stage: conan-osx
         osx_image: {{ compiler.osx_image }}

@@ -1,0 +1,93 @@
+
+{% extends 'html/organization_detail.html' %}
+
+{% block content_toolbar %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group mr-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.get_url(branch=False) }}" role="button">Index <span data-feather="home"></span></a>
+    </div>
+    <div class="btn-group mr-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ recipe.get_github_url() }}" role="button">Github <span data-feather="external-link"></span></a>
+        {% set bintray_pck_version=recipe.get_bintray_package_version(branch=recipe.active_branch) %}
+        {% if bintray_pck_version %}
+            <a class="btn btn-sm btn-outline-secondary" href="{{ bintray_pck_version.url }}" role="button">Bintray <span data-feather="external-link"></span></a>
+        {% endif %}
+    </div>
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" id="branchesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span data-feather="git-branch"></span>
+        {% if recipe.active_branch %}
+            {{ recipe.active_branch }}
+        {% else %}
+            Branches
+        {% endif %}
+    </button>
+    <div class="dropdown-menu" aria-labelledby="branchesMenuButton">
+        {% for branch in recipe.get_branches() %}
+            <a class="dropdown-item" href="{{ recipe.get_url(branch=branch) }}">
+                {{ branch }}
+                {% set n_errors = recipe.count_errors(branch=branch) %}
+                {% if n_errors %}{{ render_check('error', '', n_errors) }}{% endif %}
+                {% set n_warnings = recipe.count_warnings(branch=branch) %}
+                {% if n_warnings %}{{ render_check('warning', '', n_warnings) }}{% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content_detail %}
+
+    {% block content_detail_tab_nav %}
+        {% if files_in_tabs %}
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link{% if not file %} active{% endif %}" href="{{ recipe.get_url(branch=False) }}">Details</a>
+              </li>
+                {% for it in files_in_tabs %}
+                  <li class="nav-item">
+                    <a class="nav-link{% if file and file.name == it['title'] %} active{% endif %}" href="{{ it['url'] }}">
+                        {{ it['title'] }}{% if it['errors'] %} {{ render_check('error', '') }}{% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content" id="myTabContent">
+        {% endif %}
+    {% endblock %}
+
+    {% block content_detail_tab_content %}
+        {% set tables, _, _ = recipe._grab_warnings(branch=False) %}
+        {% for section, table in tables.items() %}
+            <h4>{{ section }}</h4>
+            <table class="table">
+                {% if table['headers'] %}
+                    <thead>
+                        <tr>
+                            {% for title in table['headers'] %}
+                                <th scope="col">{{ title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                {% endif %}
+                {% for row in table['rows'] %}
+                    <tr>
+                        {% for item in row %}
+                            {% if loop.first %}
+                                <th scope="row" class="text-nowrap">{{ item }}</th>
+                            {% else %}
+                                <td>{{ item }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endblock %}
+
+    {% if files_in_tabs %}
+        </div>
+    {% endif %}
+
+{% endblock %}
+

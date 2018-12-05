@@ -1,0 +1,70 @@
+{% extends 'html/base.html' %}
+
+{% block index_url %}{{ organization.url }}{% endblock %}
+{% block title %}{{ organization }}{% endblock %}
+{% block fulltitle %}Conan community | {{ organization }}{% endblock %}
+
+{% block content_left %}
+  <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <div class="sidebar-sticky">
+      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Recipes</span>
+        <a class="d-flex align-items-center text-muted" href="#"></a>
+      </h6>
+      <ul class="nav flex-column">
+        {% for recipe in all_recipes %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ recipe.get_url(branch=False) }}">
+                <span data-feather="file-text"></span>
+                {{ recipe }}
+                {% set n_errors = recipe.count_errors() %}
+                {% if n_errors %}{{ render_check('error', '', n_errors) }}{% endif %}
+                {% set n_warnings = recipe.count_warnings() %}
+                {% if n_warnings %}{{ render_check('warning', '', n_warnings) }}{% endif %}
+              </a>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+{% endblock %}
+
+
+{% block content %}
+  <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+
+      <h1 class="h2">
+        {{ object }}
+      </h1>
+      {% block content_toolbar %}
+      {% endblock %}
+    </div>
+
+    {% block content_detail %}
+
+      {% if errors %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Recipe</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        {% for recipe, error in errors %}
+          <tr>
+            <td>{{ recipe }}</td>
+            <td>{{ error }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+
+    {% endblock %}
+
+  </main>
+{% endblock %}
+
+{% block footer %}
+  <span class="text-muted">Generation done at {{ now().replace(microsecond=0) }}</span> | Work in progress
+{% endblock %}

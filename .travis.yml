@@ -9,14 +9,14 @@ branches:
 
 # command to install dependencies
 install:
-  - pip install -r requirements.txt
+  - pip install -e .
 
 before_script:
   - .travis/before_script.sh
 
 # command to run tests
 script:
-  - python -m conan_community_utils.views.html.conan_community --base_url=https://jgsogo.es/conan-community-web/
+  - conan_community_web --output-path=../tmp --force examples/conan_community_web.yml
 
 after_success:
   - .travis/after_success.sh

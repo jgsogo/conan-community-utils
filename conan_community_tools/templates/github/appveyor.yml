@@ -1,0 +1,39 @@
+build: false
+
+
+environment:
+    PYTHON: "C:\\Python37"
+
+    CONAN_USERNAME: "{{ config['ci']['conan_username'] }}"
+    CONAN_CHANNEL: "{{ config['ci']['conan_channel'] }}"
+    CONAN_LOGIN_USERNAME: "{{ config['bintray']['conan_login_username'] }}"
+    VS150COMNTOOLS: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\Tools\\"
+    CONAN_UPLOAD: "{{ config['bintray']['conan_upload'] }}"
+    CONAN_STABLE_BRANCH_PATTERN: "{{ config['organization']['stable_branch_pattern'] }}"
+    CONAN_UPLOAD_ONLY_WHEN_STABLE: 1 # Will only upload when the branch matches stable pattern
+    CONAN_TOTAL_PAGES: {{ config['ci'].get('total_pages', 1) }}
+{% if config['ci'].get('build_policy', None) %}    CONAN_BUILD_POLICY: {{ config['ci']['build_policy'] }}{% endif %}
+
+    matrix:
+      {% for compiler in visual_compilers %}{% for page in range(1, config['ci'].get('total_pages', 1) + 1) %}
+        - APPVEYOR_BUILD_WORKER_IMAGE: {{ compiler.worker_image }}
+          CONAN_VISUAL_VERSIONS: {{ compiler.version }}
+          CONAN_ARCHS: {{ compiler.arch }}
+          CONAN_BUILD_TYPES: {{ compiler.build_type }}
+          CONAN_VISUAL_RUNTIMES: {{ compiler.runtime }}
+          CONAN_CURRENT_PAGE: {{ page }}
+      {% endfor %}{% endfor %}
+      {% for configuration in config['appveyor']['mingw_configurations'] %}{% for page in range(1, config['ci'].get('total_pages', 1) + 1) %}
+        - MINGW_CONFIGURATIONS: "{{ configuration }}"
+          CONAN_BASH_PATH: "c:\\msys64\\usr\\bin\\bash"
+          CONAN_CURRENT_PAGE: {{ page }}
+      {% endfor %}{% endfor %}
+
+install:
+  - set PATH=%PATH%;%PYTHON%/Scripts/
+  - pip.exe install conan --upgrade
+  - pip.exe install conan_package_tools
+  - conan user # It creates the conan data directory
+
+test_script:
+  - python build.py

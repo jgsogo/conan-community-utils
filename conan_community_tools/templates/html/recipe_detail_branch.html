@@ -1,0 +1,67 @@
+{% extends 'html/recipe_detail.html' %}
+
+{% block content_detail %}
+
+    {% block content_detail_tab_nav %}
+        {% if files_in_tabs %}
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link{% if not file %} active{% endif %}" href="{{ recipe.get_url(branch=recipe.active_branch) }}">Details</a>
+              </li>
+                {% for it in files_in_tabs %}
+                  <li class="nav-item">
+                    <a class="nav-link{% if file and file.name == it['title'] %} active{% endif %}" href="{{ it['url'] }}">
+                        {{ it['title'] }}{% if it['errors'] %} {{ render_check('error', '') }}{% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content" id="myTabContent">
+        {% endif %}
+    {% endblock %}
+
+
+    {% block content_detail_tab_content %}
+        <h4>Build status</h4>
+
+        {% set status = recipe.get_travis_status(branch=recipe.active_branch) %}
+        <p>Travis: <a href="{{ status.url }}"><img alt="{{ status.status }}" src="{{ status.image_url }}"/></a></p>
+
+        {% set status = recipe.get_appveyor_status(branch=recipe.active_branch) %}
+        <p>Appveyor: <a href="{{ status.url }}"><img alt="{{ status.status }}" src="{{ status.image_url }}"/></a></p>
+
+
+        {% set tables, _, _ = recipe._grab_warnings(branch=recipe.active_branch) %}
+        {% for section, table in tables.items() %}
+            <h4>{{ section }}</h4>
+            <table class="table">
+                {% if table['headers'] %}
+                    <thead>
+                        <tr>
+                            {% for title in table['headers'] %}
+                                <th scope="col">{{ title }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                {% endif %}
+                {% for row in table['rows'] %}
+                    <tr>
+                        {% for item in row %}
+                            {% if loop.first %}
+                                <th scope="row" class="text-nowrap">{{ item }}</th>
+                            {% else %}
+                                <td>{{ item }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+
+    {% endblock %}
+
+    {% if files_in_tabs %}
+        </div>
+    {% endif %}
+
+{% endblock %}

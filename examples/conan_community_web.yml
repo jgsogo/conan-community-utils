@@ -2,7 +2,7 @@
 base_url: https://jgsogo.es/conan-community-web
 organization:
   name: conan-community
-  recipe_pattern: conan-(boost|bzip2|opencv)
+  recipe_pattern: conan-[\w_-]+
   stable_branch_pattern: (release|stable)/[a-zA-Z0-9_][a-zA-Z0-9_+.-]+
 bintray:
   subject: conan-community

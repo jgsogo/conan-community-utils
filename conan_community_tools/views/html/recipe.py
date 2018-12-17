@@ -224,6 +224,7 @@ class RecipeHTML(HTMLMixin, Recipe):
         except Exception as e:
             log.error(f"Error rendering file diffs for recipe '{self}' at main branch: (type {type(e)}) {e}")
 
+        html = None
         try:
             html = super().render(output_folder=output_folder, files_in_tabs=data, **context)
         except Exception as e:

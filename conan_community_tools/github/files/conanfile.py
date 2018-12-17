@@ -78,3 +78,4 @@ class ZlibConan(ConanFile):
 
     c = ConanFile(content=conanfile)
     print(c.name)
+    print(c._attribs['version'])

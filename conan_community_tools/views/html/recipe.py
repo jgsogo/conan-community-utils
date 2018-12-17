@@ -157,8 +157,8 @@ class RecipeHTML(HTMLMixin, Recipe):
 
                 bintray_conanfile = {'headers': ['', '', f'conanfile @ {branch}', 'Bintray'],
                                      'rows': [
-                                         _row('Name', conanfile._attribs['name'], bintray_pck.name, 'error'),
-                                         _row('Version', conanfile._attribs['version'], bintray_pck.version, 'error'),
+                                         _row('Name', conanfile._attribs.get('name', None), bintray_pck.name, 'error'),
+                                         _row('Version', conanfile._attribs.get('version', None), bintray_pck.version, 'error'),
                                          #_row('Url', conanfile._attribs.get('url', None), bintray_pck._json['vcs_url'], 'error'),
                                          #_row('Homepage', conanfile._attribs.get('homepage', None), bintray_pck._json['website_url'], 'error'),
                                          _row('Topics', conanfile._attribs.get('topics', None), bintray_pck.topics, 'error'),
